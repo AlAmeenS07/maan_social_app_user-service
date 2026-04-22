@@ -5,14 +5,15 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-model users {
+
+model user {
   id          String   @id @default(uuid())
   name        String?
   user_name   String   @unique
@@ -21,5 +22,5 @@ model users {
   is_blocked  Boolean  @default(false)
   is_verified Boolean  @default(false)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

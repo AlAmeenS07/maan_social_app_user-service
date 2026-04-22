@@ -5,12 +5,12 @@ dotenv.config()
 
 const app = express()
 
-app.get("/" , (req , res)=>{
+app.get("/", (req, res) => {
     res.send("User service is running...")
 })
 
-const PORT : number = Number(process.env.PORT)
+const PORT: number = Number(process.env.PORT)
 
-app.listen(PORT , ()=>{
+app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`)
 })
