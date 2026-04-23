@@ -6,6 +6,7 @@ export interface IUserRepository {
     findByEmail(email : string) : Promise<User | null>
     findByUserName(user_name : string) : Promise<User | null> 
     createUser(name : string , user_name : string , email : string , password : string) : Promise<User>
-    createUserProfile(id : string , dob : string , gender : Gender) : Promise<Profile>
+    createUserProfile(id : string , dob : Date , gender : Gender) : Promise<Profile>
     verifyUser(id : string) : Promise<User>
+    updatePassword(id : string , password : string) : Promise<User>
 }

@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/user.service";
+import expressAsyncHandler from "express-async-handler";
+import { errorResponse, successResponse } from "../utils/response.handler";
+import { User } from "../generated/prisma/client";
+import { OTP_SEND_TO_MAIL, OTP_SENDING_ERROR, OTP_VERFIED_SUCCESSFULLY, PASSWORD_RESET_SUCCESSFULLY, REGISTRATION_ERROR, RESET_PASSWORD_ERROR, USER_LOGIN_ERROR, USER_LOGIN_SUCCESSFULLY, USER_NOT_FOUND, VERIFY_OTP_ERROR } from "../utils/constants";
 
 
 export class UserController {
@@ -8,74 +12,128 @@ export class UserController {
     ) { }
 
 
-    async register(req: Request, res: Response) {
-        try {
+    register = expressAsyncHandler(async (req: Request, res: Response) => {
 
-            console.log(req.body)
+        const { name, email, dob, gender, password } = req.body
 
-            let { name, email, dob, gender, password } = req.body
+        const { otp, user } = await this._userService.registerUser(name, email, dob, gender, password)
 
-            let { otp, user } = await this._userService.registerUser(name, email, dob, gender, password)
-
-            res.status(201).json({
-                success: true,
-                message: "OTP send to you mail",
-            })
-
-        } catch (error: any) {
-            res.status(500).json({
-                success: false,
-                message: error.message
-            })
+        if (!otp || !user) {
+            return errorResponse(REGISTRATION_ERROR)
         }
-    }
 
-    async verifyOtp(req: Request, res: Response) {
-        try {
+        successResponse(res, user, OTP_SEND_TO_MAIL, 201)
+    })
 
-            let { email , otp } = req.body
+    login = expressAsyncHandler(async(req : Request , res : Response) => {
 
-            const { accessToken , refreshToken , user} = await this._userService.verifyUserOtp(email , otp)
+        const {email , password} = req.body
 
-            res.status(200).cookie("token" , refreshToken , {
-                httpOnly : true,
-                sameSite : "lax",
-                maxAge : 604800000
-            })
-            .json({
-                success : true,
-                message : "Otp verified successfully",
-                accessToken,
-                user
-            })
+        const {accessToken , refreshToken , user} = await this._userService.loginUserService(email , password)
 
-        } catch (error : any) {
-            res.status(500).json({
-                success: false,
-                message: error.message
-            })
+        if(!accessToken || !refreshToken || !user){
+            return errorResponse(USER_LOGIN_ERROR)
         }
-    }
 
-    async resendOtp(req : Request , res : Response) {
-        try {
+        res.cookie("token" , refreshToken , {
+            httpOnly: true,
+            sameSite: "lax",
+            maxAge: 604800000
+        })
 
-            let {email} = req.body
+        successResponse(res , {accessToken , user} , USER_LOGIN_SUCCESSFULLY)
+    })
 
-            await this._userService.resendOtpService(email)
 
-            res.status(200).json({
-                success : true,
-                message : "Resend OTP send to your mail"
-            })
-            
-        } catch (error : any) {
-             res.status(500).json({
-                success: false,
-                message: error.message
-            })
+    verifyOtp = expressAsyncHandler(async (req: Request, res: Response) => {
+
+        const { email, otp } = req.body
+
+        const { accessToken, refreshToken, updatedUser } = await this._userService.verifyUserOtp(email, otp)
+
+        if (!accessToken || !refreshToken || !updatedUser) {
+            return errorResponse(VERIFY_OTP_ERROR)
         }
-    }
 
+        res.cookie("token", refreshToken, {
+            httpOnly: true,
+            sameSite: "lax",
+            maxAge: 604800000
+        })
+
+        successResponse(res, { accessToken, updatedUser }, OTP_VERFIED_SUCCESSFULLY, 200)
+    })
+
+    resendOtp = expressAsyncHandler(async (req: Request, res: Response) => {
+
+        const { email } = req.body
+
+        const otp = await this._userService.resendOtpService(email)
+
+        if (!otp) {
+            return errorResponse(OTP_SENDING_ERROR)
+        }
+
+        successResponse(res, "", OTP_SEND_TO_MAIL)
+    })
+
+    forgotPasswordOtp = expressAsyncHandler(async (req: Request, res: Response) => {
+
+        const { email } = req.body
+
+        const otp = await this._userService.resendOtpService(email)
+
+        if (!otp) {
+            return errorResponse(OTP_SENDING_ERROR)
+        }
+
+        successResponse(res, "", OTP_SEND_TO_MAIL)
+    })
+
+    forgotPasswordOtpVerify = expressAsyncHandler(async (req: Request, res: Response) => {
+        const { email, otp } = req.body
+
+        const token = await this._userService.verifyForgotPasswordOtp(email, otp)
+
+        if (!token) {
+            return errorResponse(VERIFY_OTP_ERROR)
+        }
+
+        res.status(200).cookie("tempToken", token, {
+            httpOnly: true,
+            sameSite: "lax",
+            maxAge: 300000
+        })
+        .json({
+            success : true,
+            message : OTP_VERFIED_SUCCESSFULLY
+        })
+
+    })
+
+    forgotPassword = expressAsyncHandler(async (req: Request, res: Response) => {
+
+        const { password } = req.body
+
+        const userId = (req as any).userId
+
+        if(!userId){
+            return errorResponse(USER_NOT_FOUND , 400)
+        }
+
+        const user = await this._userService.forgotPasswordService(userId, password)
+
+        if (!user) {
+            return errorResponse(RESET_PASSWORD_ERROR)
+        }
+
+        res.clearCookie("tempToken" , {
+            httpOnly: true,
+            sameSite: "lax",
+            maxAge: 300000
+        })
+
+        successResponse(res, user, PASSWORD_RESET_SUCCESSFULLY)
+    })
 
 }

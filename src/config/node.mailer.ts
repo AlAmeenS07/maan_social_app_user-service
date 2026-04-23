@@ -13,3 +13,12 @@ export const transporter = nodemailer.createTransport({
     pass: process.env.SMTP_PASSWORD,
   },
 });
+
+export async function verifyMailer(){
+  try {
+    await transporter.verify();
+    console.log("SMTP server connected");
+  } catch (err) {
+    console.error("SMTP error:", err);
+  }
+};

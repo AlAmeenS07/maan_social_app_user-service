@@ -44,7 +44,7 @@ export class UserRepository implements IUserRepository{
         return user
     }
 
-    createUserProfile(id: string, dob: string, gender: Gender): Promise<Profile> {
+    createUserProfile(id: string, dob: Date, gender: Gender): Promise<Profile> {
         const userProfile = prisma.profile.create({
             data : {
                 userId : id,
@@ -59,6 +59,18 @@ export class UserRepository implements IUserRepository{
         const user = prisma.user.update({
             data : {
                 is_verified : true
+            },
+            where : {
+                id
+            }
+        })
+        return user
+    }
+
+    updatePassword(id: string, password: string): Promise<User> {
+        const user = prisma.user.update({
+            data : {
+                password
             },
             where : {
                 id

@@ -1,13 +1,19 @@
 import express from "express"
 import dotenv from "dotenv"
 import userRoutes from "./routes/user.routes"
-import { transporter } from "./config/node.mailer"
+import { transporter, verifyMailer } from "./config/node.mailer"
 import { connectRedis } from "./config/redis"
+import { errorHandler } from "./middlewares/error.middleware"
+import cookieParser from "cookie-parser"
 
 dotenv.config()
 
 const app = express()
 app.use(express.json())
+app.use(cookieParser())
+
+connectRedis()
+verifyMailer()
 
 app.get("/", (req, res) => {
     res.send("User service is running...")
@@ -15,22 +21,12 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/user" , userRoutes)
 
+
+app.use(errorHandler)
+
 const PORT: number = Number(process.env.PORT)
 
-
-connectRedis()
-
 app.listen(PORT, () => {
-    verifyMailer()
     console.log(`Server running on http://localhost:${PORT}`)
 })
 
-
-async function verifyMailer(){
-  try {
-    await transporter.verify();
-    console.log("SMTP server ready");
-  } catch (err) {
-    console.error("SMTP error:", err);
-  }
-};
