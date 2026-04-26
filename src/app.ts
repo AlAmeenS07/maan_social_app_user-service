@@ -15,6 +15,11 @@ app.use(cookieParser())
 connectRedis()
 verifyMailer()
 
+// app.use((req , res , next)=>{
+//     console.log("here" , req.headers , req.body)
+//     next()
+// })
+
 app.get("/", (req, res) => {
     res.send("User service is running...")
 })

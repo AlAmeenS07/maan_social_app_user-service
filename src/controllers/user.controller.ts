@@ -3,7 +3,7 @@ import { UserService } from "../services/user.service";
 import expressAsyncHandler from "express-async-handler";
 import { errorResponse, successResponse } from "../utils/response.handler";
 import { User } from "../generated/prisma/client";
-import { OTP_SEND_TO_MAIL, OTP_SENDING_ERROR, OTP_VERFIED_SUCCESSFULLY, PASSWORD_RESET_SUCCESSFULLY, REGISTRATION_ERROR, RESET_PASSWORD_ERROR, USER_LOGIN_ERROR, USER_LOGIN_SUCCESSFULLY, USER_NOT_FOUND, VERIFY_OTP_ERROR } from "../utils/constants";
+import { LOGOUT_SUCCESSSFULLY, OTP_SEND_TO_MAIL, OTP_SENDING_ERROR, OTP_VERFIED_SUCCESSFULLY, PASSWORD_RESET_SUCCESSFULLY, REGISTRATION_ERROR, RESET_PASSWORD_ERROR, USER_DATA_FETCH, USER_FETCH_ERROR, USER_LOGIN_ERROR, USER_LOGIN_SUCCESSFULLY, USER_NOT_FOUND, VERIFY_OTP_ERROR } from "../utils/constants";
 
 
 export class UserController {
@@ -13,6 +13,8 @@ export class UserController {
 
 
     register = expressAsyncHandler(async (req: Request, res: Response) => {
+
+        console.log("controller" , req.body)
 
         const { name, email, dob, gender, password } = req.body
 
@@ -25,23 +27,37 @@ export class UserController {
         successResponse(res, user, OTP_SEND_TO_MAIL, 201)
     })
 
-    login = expressAsyncHandler(async(req : Request , res : Response) => {
+    login = expressAsyncHandler(async (req: Request, res: Response) => {
 
-        const {email , password} = req.body
+        console.log("controller" , req.body)
 
-        const {accessToken , refreshToken , user} = await this._userService.loginUserService(email , password)
+        const { email, password } = req.body
 
-        if(!accessToken || !refreshToken || !user){
+        const { accessToken, refreshToken, user } = await this._userService.loginUserService(email, password)
+
+        if (!accessToken || !refreshToken || !user) {
             return errorResponse(USER_LOGIN_ERROR)
         }
 
-        res.cookie("token" , refreshToken , {
+        res.cookie("token", refreshToken, {
             httpOnly: true,
             sameSite: "lax",
             maxAge: 604800000
         })
 
-        successResponse(res , {accessToken , user} , USER_LOGIN_SUCCESSFULLY)
+        successResponse(res, { accessToken, user }, USER_LOGIN_SUCCESSFULLY)
+    })
+
+    logout = expressAsyncHandler(async (req: Request, res: Response) => {
+
+        res.clearCookie("token", {
+            httpOnly: true,
+            sameSite: "lax",
+            maxAge: 604800000
+        })
+
+        successResponse(res , "" , LOGOUT_SUCCESSSFULLY)
+
     })
 
 
@@ -104,21 +120,23 @@ export class UserController {
             sameSite: "lax",
             maxAge: 300000
         })
-        .json({
-            success : true,
-            message : OTP_VERFIED_SUCCESSFULLY
-        })
+            .json({
+                success: true,
+                message: OTP_VERFIED_SUCCESSFULLY
+            })
 
     })
 
     forgotPassword = expressAsyncHandler(async (req: Request, res: Response) => {
 
+        console.log(req.body , req.headers)
+
         const { password } = req.body
 
-        const userId = (req as any).userId
+        const userId = (req as any).headers["x-user-id"]
 
-        if(!userId){
-            return errorResponse(USER_NOT_FOUND , 400)
+        if (!userId) {
+            return errorResponse(USER_NOT_FOUND, 400)
         }
 
         const user = await this._userService.forgotPasswordService(userId, password)
@@ -127,13 +145,46 @@ export class UserController {
             return errorResponse(RESET_PASSWORD_ERROR)
         }
 
-        res.clearCookie("tempToken" , {
+        res.clearCookie("tempToken", {
             httpOnly: true,
             sameSite: "lax",
             maxAge: 300000
         })
 
         successResponse(res, user, PASSWORD_RESET_SUCCESSFULLY)
+    })
+
+
+    refreshToken = expressAsyncHandler(async(req : Request , res : Response) => {
+
+        const userId = req.headers["x-user-id"]
+
+        if(!userId){
+            return errorResponse(USER_NOT_FOUND , 404)
+        }
+
+        const {user , accessToken} = await this._userService.refreshTokenService(userId as string)
+
+        if(!user || !accessToken){
+            return errorResponse(USER_FETCH_ERROR)
+        }
+
+        successResponse(res , {user , accessToken})
+    })
+
+
+    userData = expressAsyncHandler(async(req : Request , res : Response )=>{
+
+        const userId = req.headers["x-user-id"]
+
+        if(!userId){
+            return errorResponse(USER_NOT_FOUND , 404)
+        }
+
+        const user = await this._userService.userDataService(userId as string)
+
+        successResponse(res , user , USER_DATA_FETCH)
+
     })
 
 }

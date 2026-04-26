@@ -171,4 +171,33 @@ export class UserService {
         return updatedUser
     }
 
+    async refreshTokenService(id : string){
+
+        const user = await this._userRepo.findById(id)
+
+        if(!user){
+            return errorResponse(USER_NOT_FOUND , 404)
+        }
+
+        const role = user.is_admin == true ? "admin" : "user"
+
+        const accessToken = generateAccessToken(user.id , role)
+
+        return{
+            user,
+            accessToken
+        }
+    }
+
+    async userDataService(id : string){
+        
+        const user = await this._userRepo.findById(id)
+
+        if(!user){
+            return errorResponse(USER_NOT_FOUND , 404)
+        }
+
+        return user
+    }
+
 } 
