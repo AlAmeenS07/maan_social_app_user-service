@@ -1,9 +1,9 @@
-import prisma from "../../db/prisma.client";
-import { Gender, Profile, User } from "../../generated/prisma/client";
-import { IUserRepository } from "../interfaces/user.repo.interface";
+import prisma from "../../../db/prisma.client";
+import { Gender, Profile, User } from "../../../generated/prisma/client";
+import { IUserAuthRepository } from "../../interfaces/user/user.auth.repo.interface";
 
 
-export class UserRepository implements IUserRepository{
+export class UserAuthRepository implements IUserAuthRepository{
 
     findByEmail(email: string): Promise<User | null> {
         const user =  prisma.user.findUnique({

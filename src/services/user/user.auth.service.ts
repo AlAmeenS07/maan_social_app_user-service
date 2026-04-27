@@ -1,21 +1,21 @@
-import { Gender, User } from "../generated/prisma/client";
-import { sendOTPEmail } from "../helpers/email.helper";
-import { deleteOTP, generateOTP, storeOTP, verifyOTP } from "../helpers/otp.helper";
-import { IUserRepository } from "../repositories/interfaces/user.repo.interface";
-import { comparePassword, hashPassword } from "../utils/bcrypt.util";
-import { INVALID_CREDENTIALS, INVALID_OTP, OTP_IS_EXPIRED, USER_ALREADY_EXIST_WITH_EMAIL, USER_NOT_FOUND } from "../utils/constants";
-import { generateAccessToken, generateRefreshToken, generateTempToken } from "../utils/jwt.util";
-import { errorResponse } from "../utils/response.handler";
+import { Gender, User } from "../../generated/prisma/client";
+import { sendOTPEmail } from "../../helpers/email.helper";
+import { deleteOTP, generateOTP, storeOTP, verifyOTP } from "../../helpers/otp.helper";
+import { IUserAuthRepository } from "../../repositories/interfaces/user/user.auth.repo.interface";
+import { comparePassword, hashPassword } from "../../utils/bcrypt.util";
+import { INVALID_CREDENTIALS, INVALID_OTP, OTP_IS_EXPIRED, USER_ALREADY_EXIST_WITH_EMAIL, USER_NOT_FOUND } from "../../utils/constants";
+import { generateAccessToken, generateRefreshToken, generateTempToken } from "../../utils/jwt.util";
+import { errorResponse } from "../../utils/response.handler";
 
 
-export class UserService {
+export class UserAuthService {
     constructor(
-        private _userRepo: IUserRepository
+        private _userAuthRepo: IUserAuthRepository
     ) { }
 
     async registerUser(name: string, email: string, dob: string, gender: Gender, password: string): Promise<{ otp: string, user: User }> {
 
-        const userExist = await this._userRepo.findByEmail(email)
+        const userExist = await this._userAuthRepo.findByEmail(email)
 
         if (userExist) {
             return errorResponse(USER_ALREADY_EXIST_WITH_EMAIL, 409)
@@ -25,11 +25,11 @@ export class UserService {
 
         const hashedPassword = await hashPassword(password)
 
-        const user = await this._userRepo.createUser(name, user_name, email, hashedPassword)
+        const user = await this._userAuthRepo.createUser(name, user_name, email, hashedPassword)
 
         const dobDate = new Date(`${dob}T00:00:00`);
 
-        const profile = await this._userRepo.createUserProfile(user.id, dobDate, gender)
+        const profile = await this._userAuthRepo.createUserProfile(user.id, dobDate, gender)
 
         const otp = generateOTP()
 
@@ -47,7 +47,7 @@ export class UserService {
 
     async loginUserService(email : string , password : string) : Promise<{accessToken : string , refreshToken : string , user : User}>{
 
-        const user = await this._userRepo.findByEmail(email)
+        const user = await this._userAuthRepo.findByEmail(email)
 
         if(!user){
             return errorResponse(USER_NOT_FOUND , 404)
@@ -73,7 +73,7 @@ export class UserService {
 
     async verifyUserOtp(email: string, otp: string): Promise<{ accessToken: string, refreshToken: string, updatedUser: User }> {
 
-        const user = await this._userRepo.findByEmail(email)
+        const user = await this._userAuthRepo.findByEmail(email)
 
         if (!user) {
             return errorResponse(USER_NOT_FOUND, 404)
@@ -93,7 +93,7 @@ export class UserService {
 
         await deleteOTP(key)
 
-        const updatedUser = await this._userRepo.verifyUser(user.id)
+        const updatedUser = await this._userAuthRepo.verifyUser(user.id)
 
         const role: string = updatedUser.is_admin == true ? "admin" : "user"
 
@@ -110,7 +110,7 @@ export class UserService {
 
     async resendOtpService(email: string) {
 
-        const user = await this._userRepo.findByEmail(email)
+        const user = await this._userAuthRepo.findByEmail(email)
 
         if (!user) {
             return errorResponse(USER_NOT_FOUND, 404)
@@ -129,7 +129,7 @@ export class UserService {
 
     async verifyForgotPasswordOtp(email: string, otp: string) {
 
-        const user = await this._userRepo.findByEmail(email)
+        const user = await this._userAuthRepo.findByEmail(email)
 
         if (!user) {
             return errorResponse(USER_NOT_FOUND, 404)
@@ -158,7 +158,7 @@ export class UserService {
 
     async forgotPasswordService(id: string, password: string) {
 
-        const user = await this._userRepo.findById(id)
+        const user = await this._userAuthRepo.findById(id)
 
         if (!user) {
             return errorResponse(USER_NOT_FOUND, 404)
@@ -166,14 +166,14 @@ export class UserService {
 
         const hashedPassword = await hashPassword(password)
 
-        const updatedUser = await this._userRepo.updatePassword(user.id, hashedPassword)
+        const updatedUser = await this._userAuthRepo.updatePassword(user.id, hashedPassword)
 
         return updatedUser
     }
 
     async refreshTokenService(id : string){
 
-        const user = await this._userRepo.findById(id)
+        const user = await this._userAuthRepo.findById(id)
 
         if(!user){
             return errorResponse(USER_NOT_FOUND , 404)
@@ -191,7 +191,7 @@ export class UserService {
 
     async userDataService(id : string){
         
-        const user = await this._userRepo.findById(id)
+        const user = await this._userAuthRepo.findById(id)
 
         if(!user){
             return errorResponse(USER_NOT_FOUND , 404)

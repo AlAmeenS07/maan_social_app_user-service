@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import { UserService } from "../services/user.service";
+import { UserAuthService } from "../../services/user/user.auth.service";
 import expressAsyncHandler from "express-async-handler";
-import { errorResponse, successResponse } from "../utils/response.handler";
-import { User } from "../generated/prisma/client";
-import { LOGOUT_SUCCESSSFULLY, OTP_SEND_TO_MAIL, OTP_SENDING_ERROR, OTP_VERFIED_SUCCESSFULLY, PASSWORD_RESET_SUCCESSFULLY, REGISTRATION_ERROR, RESET_PASSWORD_ERROR, USER_DATA_FETCH, USER_FETCH_ERROR, USER_LOGIN_ERROR, USER_LOGIN_SUCCESSFULLY, USER_NOT_FOUND, VERIFY_OTP_ERROR } from "../utils/constants";
+import { errorResponse, successResponse } from "../../utils/response.handler";
+import { User } from "../../generated/prisma/client";
+import { LOGIN_ERROR, LOGIN_SUCCESSFULLY, LOGOUT_SUCCESSSFULLY, OTP_SEND_TO_MAIL, OTP_SENDING_ERROR, OTP_VERFIED_SUCCESSFULLY, PASSWORD_RESET_SUCCESSFULLY, REGISTRATION_ERROR, RESET_PASSWORD_ERROR, USER_DATA_FETCH, USER_FETCH_ERROR, USER_NOT_FOUND, VERIFY_OTP_ERROR } from "../../utils/constants";
 
 
-export class UserController {
+export class UserAuthController {
     constructor(
-        private _userService: UserService
+        private _userService: UserAuthService
     ) { }
 
 
@@ -36,7 +36,7 @@ export class UserController {
         const { accessToken, refreshToken, user } = await this._userService.loginUserService(email, password)
 
         if (!accessToken || !refreshToken || !user) {
-            return errorResponse(USER_LOGIN_ERROR)
+            return errorResponse(LOGIN_ERROR)
         }
 
         res.cookie("token", refreshToken, {
@@ -45,7 +45,7 @@ export class UserController {
             maxAge: 604800000
         })
 
-        successResponse(res, { accessToken, user }, USER_LOGIN_SUCCESSFULLY)
+        successResponse(res, { accessToken, user }, LOGIN_SUCCESSFULLY)
     })
 
     logout = expressAsyncHandler(async (req: Request, res: Response) => {

@@ -5,6 +5,7 @@ import { transporter, verifyMailer } from "./config/node.mailer"
 import { connectRedis } from "./config/redis"
 import { errorHandler } from "./middlewares/error.middleware"
 import cookieParser from "cookie-parser"
+import adminRoutes from "./routes/admin.routes"
 
 dotenv.config()
 
@@ -25,6 +26,8 @@ app.get("/", (req, res) => {
 })
 
 app.use("/api/v1/user" , userRoutes)
+
+app.use("/api/v1/admin" , adminRoutes)
 
 
 app.use(errorHandler)

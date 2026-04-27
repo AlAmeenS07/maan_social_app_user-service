@@ -1,7 +1,7 @@
-import { Gender, Profile, User } from "../../generated/prisma/client"
+import { Gender, Profile, User } from "../../../generated/prisma/client"
 
 
-export interface IUserRepository {
+export interface IUserAuthRepository {
     findById(id : string) : Promise<User | null>
     findByEmail(email : string) : Promise<User | null>
     findByUserName(user_name : string) : Promise<User | null> 
