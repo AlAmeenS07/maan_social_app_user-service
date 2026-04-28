@@ -4,13 +4,24 @@ import { IAdminUserRepository } from "../../interfaces/admin/admin.user.repo.int
 
 
 export class AdminUserRepository implements IAdminUserRepository{
-    async findAll(): Promise<User[]> {
+
+    async findAll(filter: any, skip: number, limit: number): Promise<User[]> {
         const users = prisma.user.findMany({
-            where : {
-                is_admin : false
+            where : filter,
+            skip : skip,
+            take : limit,
+            orderBy : {
+                createdAt : "desc"
             }
         })
         return users
+    }
+
+    async count(filter: any): Promise<number> {
+        const counts = prisma.user.count({
+            where : filter
+        })
+        return counts
     }
 
     async findById(id: string): Promise<User | null> {

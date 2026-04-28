@@ -3,7 +3,9 @@ import { UserAuthService } from "../../services/user/user.auth.service";
 import expressAsyncHandler from "express-async-handler";
 import { errorResponse, successResponse } from "../../utils/response.handler";
 import { User } from "../../generated/prisma/client";
-import { LOGIN_ERROR, LOGIN_SUCCESSFULLY, LOGOUT_SUCCESSSFULLY, OTP_SEND_TO_MAIL, OTP_SENDING_ERROR, OTP_VERFIED_SUCCESSFULLY, PASSWORD_RESET_SUCCESSFULLY, REGISTRATION_ERROR, RESET_PASSWORD_ERROR, USER_DATA_FETCH, USER_FETCH_ERROR, USER_NOT_FOUND, VERIFY_OTP_ERROR } from "../../utils/constants";
+import { JwtPayload } from "jsonwebtoken";
+import { veriftyToken } from "../../utils/jwt.util";
+import { LOGIN_ERROR, LOGIN_SUCCESSFULLY, LOGOUT_SUCCESSSFULLY, OTP_SEND_TO_MAIL, OTP_SENDING_ERROR, OTP_VERFIED_SUCCESSFULLY, PASSWORD_RESET_SUCCESSFULLY, REGISTRATION_ERROR, RESET_PASSWORD_ERROR, USER_DATA_FETCH, USER_FETCH_ERROR, USER_NOT_FOUND, VERIFY_OTP_ERROR, TOKEN_MISSING } from "../../utils/constants";
 
 
 export class UserAuthController {
@@ -13,8 +15,6 @@ export class UserAuthController {
 
 
     register = expressAsyncHandler(async (req: Request, res: Response) => {
-
-        console.log("controller" , req.body)
 
         const { name, email, dob, gender, password } = req.body
 
@@ -28,8 +28,6 @@ export class UserAuthController {
     })
 
     login = expressAsyncHandler(async (req: Request, res: Response) => {
-
-        console.log("controller" , req.body)
 
         const { email, password } = req.body
 
@@ -56,7 +54,7 @@ export class UserAuthController {
             maxAge: 604800000
         })
 
-        successResponse(res , "" , LOGOUT_SUCCESSSFULLY)
+        successResponse(res, "", LOGOUT_SUCCESSSFULLY)
 
     })
 
@@ -129,7 +127,7 @@ export class UserAuthController {
 
     forgotPassword = expressAsyncHandler(async (req: Request, res: Response) => {
 
-        console.log(req.body , req.headers)
+        console.log(req.body, req.headers)
 
         const { password } = req.body
 
@@ -155,35 +153,37 @@ export class UserAuthController {
     })
 
 
-    refreshToken = expressAsyncHandler(async(req : Request , res : Response) => {
+    refreshToken = expressAsyncHandler(async (req: Request, res: Response) => {
 
-        const userId = req.headers["x-user-id"]
+        const { token } = req.cookies;
 
-        if(!userId){
-            return errorResponse(USER_NOT_FOUND , 404)
+        if (!token) {
+            return errorResponse(TOKEN_MISSING, 401)
         }
 
-        const {user , accessToken} = await this._userService.refreshTokenService(userId as string)
+        const decoded = veriftyToken(token) as JwtPayload;
 
-        if(!user || !accessToken){
-            return errorResponse(USER_FETCH_ERROR)
+        const { user, accessToken } = await this._userService.refreshTokenService(decoded.userId)
+
+        if (!user || !accessToken) {
+            return errorResponse(USER_FETCH_ERROR, 401)
         }
 
-        successResponse(res , {user , accessToken})
+        successResponse(res, { user, accessToken })
     })
 
 
-    userData = expressAsyncHandler(async(req : Request , res : Response )=>{
+    userData = expressAsyncHandler(async (req: Request, res: Response) => {
 
         const userId = req.headers["x-user-id"]
 
-        if(!userId){
-            return errorResponse(USER_NOT_FOUND , 404)
+        if (!userId) {
+            return errorResponse(USER_NOT_FOUND, 404)
         }
 
         const user = await this._userService.userDataService(userId as string)
 
-        successResponse(res , user , USER_DATA_FETCH)
+        successResponse(res, user, USER_DATA_FETCH)
 
     })
 
