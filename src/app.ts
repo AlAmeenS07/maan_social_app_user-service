@@ -25,6 +25,7 @@ app.get("/", (req, res) => {
     res.send("User service is running...")
 })
 
+
 app.use("/api/v1/user" , userRoutes)
 
 app.use("/api/v1/admin" , adminRoutes)

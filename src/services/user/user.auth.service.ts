@@ -3,7 +3,7 @@ import { sendOTPEmail } from "../../helpers/email.helper";
 import { deleteOTP, generateOTP, storeOTP, verifyOTP } from "../../helpers/otp.helper";
 import { IUserAuthRepository } from "../../repositories/interfaces/user/user.auth.repo.interface";
 import { comparePassword, hashPassword } from "../../utils/bcrypt.util";
-import { INVALID_CREDENTIALS, INVALID_OTP, OTP_IS_EXPIRED, USER_ALREADY_EXIST_WITH_EMAIL, USER_NOT_FOUND } from "../../utils/constants";
+import { INVALID_CREDENTIALS, INVALID_OTP, INVALID_USER, OTP_IS_EXPIRED, USER_ALREADY_EXIST_WITH_EMAIL, USER_BLOCKED, USER_NOT_FOUND } from "../../utils/constants";
 import { generateAccessToken, generateRefreshToken, generateTempToken } from "../../utils/jwt.util";
 import { errorResponse } from "../../utils/response.handler";
 
@@ -53,13 +53,25 @@ export class UserAuthService {
             return errorResponse(USER_NOT_FOUND , 404)
         }
 
+        console.log("here-service-login" , user)
+
+        if(user.is_admin){
+            return errorResponse(INVALID_USER , 400)
+        }
+
+        if(user.is_blocked){
+            return errorResponse(USER_BLOCKED , 400)
+        }
+
         const checkPassword = await comparePassword(password , user.password)
+
+        console.log("check-password" , checkPassword)
 
         if(!checkPassword){
             return errorResponse(INVALID_CREDENTIALS , 409)
         }
 
-        const role = user.is_admin == true ? "admin" : "user"
+        const role = "user"
 
         const accessToken = generateAccessToken(user.id , role)
         const refreshToken = generateRefreshToken(user.id , role)
@@ -70,6 +82,7 @@ export class UserAuthService {
             user
         }
     }
+    
 
     async verifyUserOtp(email: string, otp: string): Promise<{ accessToken: string, refreshToken: string, updatedUser: User }> {
 
@@ -177,6 +190,10 @@ export class UserAuthService {
 
         if(!user){
             return errorResponse(USER_NOT_FOUND , 404)
+        }
+
+        if(user.is_blocked){
+            return errorResponse(USER_BLOCKED , 403)
         }
 
         const role = user.is_admin == true ? "admin" : "user"

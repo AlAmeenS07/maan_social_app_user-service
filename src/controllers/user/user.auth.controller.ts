@@ -31,6 +31,8 @@ export class UserAuthController {
 
         const { email, password } = req.body
 
+        console.log("controller" , req.body)
+
         const { accessToken, refreshToken, user } = await this._userService.loginUserService(email, password)
 
         if (!accessToken || !refreshToken || !user) {

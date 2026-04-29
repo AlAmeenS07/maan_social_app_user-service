@@ -12,6 +12,7 @@ const userService = new UserAuthService(userRepo)
 const userController = new UserAuthController(userService)
 
 
+
 router.post("/auth/register" , validate(registerSchema) , userController.register)
 router.post("/auth/verify-otp", validate(otpSchema) , userController.verifyOtp)
 router.post("/auth/resend-otp" , validate(emailSchema) , userController.resendOtp)
