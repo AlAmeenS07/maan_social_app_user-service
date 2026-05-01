@@ -1,3 +1,4 @@
+import { userDto } from "../../dto/user/user.dto";
 import { IAdminUserRepository } from "../../repositories/interfaces/admin/admin.user.repo.interface";
 import { USER_NOT_FOUND } from "../../utils/constants";
 import { errorResponse } from "../../utils/response.handler";
@@ -46,8 +47,12 @@ export class AdminUserService {
             this._adminUserRepo.count(filter),
         ]);
 
+        const updatedUsers = users?.map((user)=>{
+            return userDto(user)
+        })
+
         return {
-            users,
+            users : updatedUsers,
             total
         }
 
@@ -65,7 +70,13 @@ export class AdminUserService {
 
         const updatedUser = await this._adminUserRepo.findByIdAndBlockUnblock(id, status)
 
-        return updatedUser
+        if(!updatedUser){
+            return errorResponse(USER_NOT_FOUND, 404)
+        }
+
+        const mappedUser = userDto(updatedUser)
+
+        return mappedUser
     }
 
 }

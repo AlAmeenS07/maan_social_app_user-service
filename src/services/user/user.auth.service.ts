@@ -1,3 +1,4 @@
+import { UserDto, userDto } from "../../dto/user/user.dto";
 import { Gender, User } from "../../generated/prisma/client";
 import { sendOTPEmail } from "../../helpers/email.helper";
 import { deleteOTP, generateOTP, storeOTP, verifyOTP } from "../../helpers/otp.helper";
@@ -13,7 +14,7 @@ export class UserAuthService {
         private _userAuthRepo: IUserAuthRepository
     ) { }
 
-    async registerUser(name: string, email: string, dob: string, gender: Gender, password: string): Promise<{ otp: string, user: User }> {
+    async registerUser(name: string, email: string, dob: string, gender: Gender, password: string): Promise<{ otp: string, user: UserDto }> {
 
         const userExist = await this._userAuthRepo.findByEmail(email)
 
@@ -39,13 +40,15 @@ export class UserAuthService {
 
         await storeOTP(key, otp)
 
+        const mappedUser = userDto(user)
+
         return {
             otp,
-            user
+            user : mappedUser
         }
     }
 
-    async loginUserService(email : string , password : string) : Promise<{accessToken : string , refreshToken : string , user : User}>{
+    async loginUserService(email : string , password : string) : Promise<{accessToken : string , refreshToken : string , user : UserDto}>{
 
         const user = await this._userAuthRepo.findByEmail(email)
 
@@ -68,7 +71,7 @@ export class UserAuthService {
         console.log("check-password" , checkPassword)
 
         if(!checkPassword){
-            return errorResponse(INVALID_CREDENTIALS , 409)
+            return errorResponse(INVALID_CREDENTIALS , 400)
         }
 
         const role = "user"
@@ -76,15 +79,17 @@ export class UserAuthService {
         const accessToken = generateAccessToken(user.id , role)
         const refreshToken = generateRefreshToken(user.id , role)
 
+        const mappedUser = userDto(user)
+
         return {
             accessToken,
             refreshToken,
-            user
+            user : mappedUser
         }
     }
     
 
-    async verifyUserOtp(email: string, otp: string): Promise<{ accessToken: string, refreshToken: string, updatedUser: User }> {
+    async verifyUserOtp(email: string, otp: string): Promise<{ accessToken: string, refreshToken: string, updatedUser: UserDto }> {
 
         const user = await this._userAuthRepo.findByEmail(email)
 
@@ -97,7 +102,7 @@ export class UserAuthService {
         const otpResult = await verifyOTP(key, otp)
 
         if (otpResult == null) {
-            return errorResponse(OTP_IS_EXPIRED, 408)
+            return errorResponse(OTP_IS_EXPIRED, 400)
         }
 
         if (otpResult == false) {
@@ -113,10 +118,12 @@ export class UserAuthService {
         const accessToken = generateAccessToken(updatedUser.id, role)
         const refreshToken = generateRefreshToken(updatedUser.id, role)
 
+        const mappedUser = userDto(updatedUser)
+
         return {
             accessToken,
             refreshToken,
-            updatedUser
+            updatedUser : mappedUser
         }
     }
 
@@ -181,7 +188,9 @@ export class UserAuthService {
 
         const updatedUser = await this._userAuthRepo.updatePassword(user.id, hashedPassword)
 
-        return updatedUser
+        const mappedUser = userDto(updatedUser)
+
+        return mappedUser
     }
 
     async refreshTokenService(id : string){
@@ -200,8 +209,10 @@ export class UserAuthService {
 
         const accessToken = generateAccessToken(user.id , role)
 
+        const mappedUser = userDto(user)
+
         return{
-            user,
+            user : mappedUser,
             accessToken
         }
     }
@@ -214,7 +225,9 @@ export class UserAuthService {
             return errorResponse(USER_NOT_FOUND , 404)
         }
 
-        return user
+        const mappedUser = userDto(user)
+
+        return mappedUser
     }
 
 } 

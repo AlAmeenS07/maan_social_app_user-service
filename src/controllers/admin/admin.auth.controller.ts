@@ -9,7 +9,7 @@ import { LOGIN_ERROR, LOGIN_SUCCESSFULLY, LOGOUT_SUCCESSSFULLY } from "../../uti
 export class AdminAuthController {
     constructor(
         private _adminAuthService: AdminAuthService
-    ) { }
+    ) {}
 
     loginAdmin = expressAsyncHandler(async (req: Request, res: Response) => {
 

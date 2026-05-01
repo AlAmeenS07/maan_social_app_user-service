@@ -1,5 +1,5 @@
+import { userDto } from "../../dto/user/user.dto";
 import { IAdminAuthRepository } from "../../repositories/interfaces/admin/admin.auth.repo.interface";
-import { IUserAuthRepository } from "../../repositories/interfaces/user/user.auth.repo.interface";
 import { comparePassword } from "../../utils/bcrypt.util";
 import { INVALID_CREDENTIALS, INVALID_USER, USER_NOT_FOUND } from "../../utils/constants";
 import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.util";
@@ -35,8 +35,10 @@ export class AdminAuthService{
         const accessToken = generateAccessToken(user.id , role)
         const refreshToken = generateRefreshToken(user.id , role)
 
+        const mappedUser = userDto(user)
+
         return {
-            user,
+            user : mappedUser,
             accessToken,
             refreshToken
         }
