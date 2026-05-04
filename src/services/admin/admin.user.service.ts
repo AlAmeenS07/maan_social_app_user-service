@@ -3,17 +3,40 @@ import { IAdminUserRepository } from "../../repositories/interfaces/admin/admin.
 import { USER_NOT_FOUND } from "../../utils/constants";
 import { errorResponse } from "../../utils/response.handler";
 
+export type FindUsersQuery = {
+  search?: string;
+  status?: "active" | "blocked" | "";
+  from?: string;
+  to?: string;
+  page?: number;
+  limit?: number;
+};
+
+
+export type UserFilter = {
+  is_admin: boolean;
+  OR?: {
+    name?: { contains: string; mode: "insensitive" };
+    email?: { contains: string; mode: "insensitive" };
+    user_name?: { contains: string; mode: "insensitive" };
+  }[];
+  is_blocked?: boolean;
+  createdAt?: {
+    gte: Date;
+    lte: Date;
+  };
+};
 
 export class AdminUserService {
     constructor(
         private _adminUserRepo: IAdminUserRepository
     ) { }
 
-    async findAllUsersService(query: any) {
+    async findAllUsersService(query: FindUsersQuery) {
 
-        const { search, status, from, to, page, limit } = query;
+        const { search, status, from, to, page = 1, limit = 10 } = query;
 
-        const filter: any = {
+        const filter : UserFilter = {
             is_admin: false,
         };
 

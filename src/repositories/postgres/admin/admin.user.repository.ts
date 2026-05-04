@@ -1,11 +1,11 @@
 import prisma from "../../../db/prisma.client";
-import { User } from "../../../generated/prisma/client";
+import { Prisma, User } from "../../../generated/prisma/client";
 import { IAdminUserRepository } from "../../interfaces/admin/admin.user.repo.interface";
 
 
 export class AdminUserRepository implements IAdminUserRepository{
 
-    async findAll(filter: any, skip: number, limit: number): Promise<User[]> {
+    async findAll(filter: Prisma.UserWhereInput, skip: number, limit: number): Promise<User[]> {
         const users = prisma.user.findMany({
             where : filter,
             skip : skip,
@@ -17,7 +17,7 @@ export class AdminUserRepository implements IAdminUserRepository{
         return users
     }
 
-    async count(filter: any): Promise<number> {
+    async count(filter: Prisma.UserWhereInput): Promise<number> {
         const counts = prisma.user.count({
             where : filter
         })

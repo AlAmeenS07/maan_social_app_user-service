@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { UserAuthService } from "../../services/user/user.auth.service";
 import expressAsyncHandler from "express-async-handler";
 import { errorResponse, successResponse } from "../../utils/response.handler";
-import { User } from "../../generated/prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 import { veriftyToken } from "../../utils/jwt.util";
 import { LOGIN_ERROR, LOGIN_SUCCESSFULLY, LOGOUT_SUCCESSSFULLY, OTP_SEND_TO_MAIL, OTP_SENDING_ERROR, OTP_VERFIED_SUCCESSFULLY, PASSWORD_RESET_SUCCESSFULLY, REGISTRATION_ERROR, RESET_PASSWORD_ERROR, USER_DATA_FETCH, USER_FETCH_ERROR, USER_NOT_FOUND, VERIFY_OTP_ERROR, TOKEN_MISSING } from "../../utils/constants";
@@ -129,17 +128,15 @@ export class UserAuthController {
 
     forgotPassword = expressAsyncHandler(async (req: Request, res: Response) => {
 
-        console.log(req.body, req.headers)
-
         const { password } = req.body
 
-        const userId = (req as any).headers["x-user-id"]
+        const userId = req.headers["x-user-id"]
 
         if (!userId) {
             return errorResponse(USER_NOT_FOUND, 400)
         }
 
-        const user = await this._userService.forgotPasswordService(userId, password)
+        const user = await this._userService.forgotPasswordService(userId as string, password)
 
         if (!user) {
             return errorResponse(RESET_PASSWORD_ERROR)

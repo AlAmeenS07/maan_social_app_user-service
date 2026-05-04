@@ -1,5 +1,5 @@
 import { UserDto, userDto } from "../../dto/user/user.dto";
-import { Gender, User } from "../../generated/prisma/client";
+import { Gender } from "../../generated/prisma/client";
 import { sendOTPEmail } from "../../helpers/email.helper";
 import { deleteOTP, generateOTP, storeOTP, verifyOTP } from "../../helpers/otp.helper";
 import { IUserAuthRepository } from "../../repositories/interfaces/user/user.auth.repo.interface";
@@ -30,7 +30,7 @@ export class UserAuthService {
 
         const dobDate = new Date(`${dob}T00:00:00`);
 
-        const profile = await this._userAuthRepo.createUserProfile(user.id, dobDate, gender)
+        await this._userAuthRepo.createUserProfile(user.id, dobDate, gender)
 
         const otp = generateOTP()
 

@@ -3,6 +3,7 @@ import { AdminUserService } from "../../services/admin/admin.user.service";
 import { Request, Response } from "express";
 import { errorResponse, successResponse } from "../../utils/response.handler";
 import { USER_NOT_FOUND, USER_STATUS_CHANGED_SUCCESSFULLY, USERS_FETCH_SUCCESSFULLY } from "../../utils/constants";
+import { FindUsersQuery } from "../../services/admin/admin.user.service";
 
 
 export class AdminUserController {
@@ -23,7 +24,7 @@ export class AdminUserController {
             limit: Number(limit) || 10,
         };
 
-        const {users , total} = await this._adminUserService.findAllUsersService(query)
+        const {users , total} = await this._adminUserService.findAllUsersService(query as FindUsersQuery)
 
         successResponse(res, {users , totalPages : Math.ceil(total / Number(limit))}, USERS_FETCH_SUCCESSFULLY)
 
