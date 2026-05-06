@@ -13,14 +13,41 @@ datasource db {
 }
 
 
-model user {
+model User {
   id          String   @id @default(uuid())
-  name        String?
+  name        String
   user_name   String   @unique
   email       String   @unique
   password    String
   is_blocked  Boolean  @default(false)
   is_verified Boolean  @default(false)
+  is_admin    Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  profile     Profile?
+}
+
+
+enum Gender {
+  male
+  female
+  other
+}
+
+
+model Profile {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  dob       DateTime
+  gender    Gender
+  location  String?
+  avatar    String?
+  bioHead   String?
+  bioText   String?
+  bioLinks  String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User @relation(fields: [userId], references: [id])
 }

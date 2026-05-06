@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node src/app.ts",
+    "dev": "nodemon --watch src --ext ts,js,json --exec ts-node src/app.ts",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix"
   },
@@ -16,9 +16,12 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.6.0",
+    "@types/nodemailer": "^8.0.0",
     "@typescript-eslint/eslint-plugin": "^8.59.0",
     "@typescript-eslint/parser": "^8.59.0",
     "eslint": "^10.2.1",
@@ -33,12 +36,17 @@
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
     "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-async-handler": "^1.2.0",
     "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^8.0.5",
     "pg": "^8.20.0",
     "redis": "^5.12.1",
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.0",
+    "zod": "^4.3.6"
   }
 }
