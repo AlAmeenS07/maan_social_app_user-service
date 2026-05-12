@@ -23,3 +23,16 @@ export const SOMETHING_ERROR : string = "Something error !"
 export const USERS_FETCH_SUCCESSFULLY : string = "Users fetched successfully"
 export const USER_STATUS_CHANGED_SUCCESSFULLY : string = "User status changed successfully"
 export const USER_BLOCKED : string = "User is blocked by admin !"
+
+
+
+export enum statusCodes {
+    SERVER_ERROR = 500,
+    NOT_FOUND = 404,
+    BAD_REQUEST = 400,
+    FORBIDDEN = 403,
+    CONFLICT = 409,
+    UNAUTHORIZED = 401,
+    SUCCESS = 200,
+    CREATED = 201,
+}

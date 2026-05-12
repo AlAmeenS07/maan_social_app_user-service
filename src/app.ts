@@ -26,9 +26,9 @@ app.get("/", (req, res) => {
 })
 
 
-app.use("/api/v1/user" , userRoutes)
+app.use(process.env.API_USER_ROUTE as string , userRoutes)
 
-app.use("/api/v1/admin" , adminRoutes)
+app.use(process.env.API_ADMIN_ROUTE as string , adminRoutes)
 
 
 app.use(errorHandler)

@@ -1,6 +1,6 @@
 
 import { NextFunction, Request, Response } from "express";
-import { INTERNAL_SERVER_ERROR } from "../utils/constants";
+import { INTERNAL_SERVER_ERROR, statusCodes } from "../utils/constants";
 
 
 export class AppError extends Error {
@@ -17,7 +17,7 @@ export class AppError extends Error {
 export const errorHandler = (err : AppError, req : Request, res : Response, _next : NextFunction) => {
   console.error("ERROR:", err);
 
-  const statusCode = err.statusCode || 500;
+  const statusCode = err.statusCode || statusCodes.SERVER_ERROR;
 
   res.status(statusCode).json({
     success: false,

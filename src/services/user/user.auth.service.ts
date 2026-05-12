@@ -1,15 +1,16 @@
 import { UserDto, userDto } from "../../dto/user/user.dto";
-import { Gender } from "../../generated/prisma/client";
 import { sendOTPEmail } from "../../helpers/email.helper";
 import { deleteOTP, generateOTP, storeOTP, verifyOTP } from "../../helpers/otp.helper";
 import { IUserAuthRepository } from "../../repositories/interfaces/user/user.auth.repo.interface";
+import { Gender, User } from "../../types/user/user.type";
 import { comparePassword, hashPassword } from "../../utils/bcrypt.util";
-import { INVALID_CREDENTIALS, INVALID_OTP, INVALID_USER, OTP_IS_EXPIRED, USER_ALREADY_EXIST_WITH_EMAIL, USER_BLOCKED, USER_NOT_FOUND } from "../../utils/constants";
+import { INVALID_CREDENTIALS, INVALID_OTP, INVALID_USER, OTP_IS_EXPIRED, statusCodes, USER_ALREADY_EXIST_WITH_EMAIL, USER_BLOCKED, USER_NOT_FOUND } from "../../utils/constants";
 import { generateAccessToken, generateRefreshToken, generateTempToken } from "../../utils/jwt.util";
 import { errorResponse } from "../../utils/response.handler";
+import { IUserAuthService } from "../interfaces/user/user.auth.service.interface";
 
 
-export class UserAuthService {
+export class UserAuthService implements IUserAuthService {
     constructor(
         private _userAuthRepo: IUserAuthRepository
     ) { }
@@ -19,7 +20,7 @@ export class UserAuthService {
         const userExist = await this._userAuthRepo.findByEmail(email)
 
         if (userExist) {
-            return errorResponse(USER_ALREADY_EXIST_WITH_EMAIL, 409)
+            return errorResponse(USER_ALREADY_EXIST_WITH_EMAIL, statusCodes.CONFLICT)
         }
 
         const user_name: string = email
@@ -53,17 +54,17 @@ export class UserAuthService {
         const user = await this._userAuthRepo.findByEmail(email)
 
         if(!user){
-            return errorResponse(USER_NOT_FOUND , 404)
+            return errorResponse(USER_NOT_FOUND , statusCodes.BAD_REQUEST)
         }
 
         console.log("here-service-login" , user)
 
         if(user.is_admin){
-            return errorResponse(INVALID_USER , 400)
+            return errorResponse(INVALID_USER , statusCodes.BAD_REQUEST)
         }
 
         if(user.is_blocked){
-            return errorResponse(USER_BLOCKED , 400)
+            return errorResponse(USER_BLOCKED , statusCodes.BAD_REQUEST)
         }
 
         const checkPassword = await comparePassword(password , user.password)
@@ -71,7 +72,7 @@ export class UserAuthService {
         console.log("check-password" , checkPassword)
 
         if(!checkPassword){
-            return errorResponse(INVALID_CREDENTIALS , 400)
+            return errorResponse(INVALID_CREDENTIALS , statusCodes.BAD_REQUEST)
         }
 
         const role = "user"
@@ -94,7 +95,7 @@ export class UserAuthService {
         const user = await this._userAuthRepo.findByEmail(email)
 
         if (!user) {
-            return errorResponse(USER_NOT_FOUND, 404)
+            return errorResponse(USER_NOT_FOUND, statusCodes.NOT_FOUND)
         }
 
         const key = `otp:${user?.email}`
@@ -102,11 +103,11 @@ export class UserAuthService {
         const otpResult = await verifyOTP(key, otp)
 
         if (otpResult == null) {
-            return errorResponse(OTP_IS_EXPIRED, 400)
+            return errorResponse(OTP_IS_EXPIRED, statusCodes.BAD_REQUEST)
         }
 
         if (otpResult == false) {
-            return errorResponse(INVALID_OTP, 400)
+            return errorResponse(INVALID_OTP, statusCodes.BAD_REQUEST)
         }
 
         await deleteOTP(key)
@@ -133,7 +134,7 @@ export class UserAuthService {
         const user = await this._userAuthRepo.findByEmail(email)
 
         if (!user) {
-            return errorResponse(USER_NOT_FOUND, 404)
+            return errorResponse(USER_NOT_FOUND, statusCodes.NOT_FOUND)
         }
 
         const otp = generateOTP()
@@ -152,7 +153,7 @@ export class UserAuthService {
         const user = await this._userAuthRepo.findByEmail(email)
 
         if (!user) {
-            return errorResponse(USER_NOT_FOUND, 404)
+            return errorResponse(USER_NOT_FOUND, statusCodes.NOT_FOUND)
         }
 
         const key = `otp:${user?.email}`
@@ -160,11 +161,11 @@ export class UserAuthService {
         const otpResult = await verifyOTP(key, otp)
 
         if (otpResult == null) {
-            return errorResponse(OTP_IS_EXPIRED, 408)
+            return errorResponse(OTP_IS_EXPIRED, statusCodes.BAD_REQUEST)
         }
 
         if (otpResult == false) {
-            return errorResponse(INVALID_OTP, 400)
+            return errorResponse(INVALID_OTP, statusCodes.BAD_REQUEST)
         }
 
         await deleteOTP(key)
@@ -181,7 +182,7 @@ export class UserAuthService {
         const user = await this._userAuthRepo.findById(id)
 
         if (!user) {
-            return errorResponse(USER_NOT_FOUND, 404)
+            return errorResponse(USER_NOT_FOUND, statusCodes.NOT_FOUND)
         }
 
         const hashedPassword = await hashPassword(password)
@@ -198,11 +199,11 @@ export class UserAuthService {
         const user = await this._userAuthRepo.findById(id)
 
         if(!user){
-            return errorResponse(USER_NOT_FOUND , 404)
+            return errorResponse(USER_NOT_FOUND , statusCodes.NOT_FOUND)
         }
 
         if(user.is_blocked){
-            return errorResponse(USER_BLOCKED , 403)
+            return errorResponse(USER_BLOCKED , statusCodes.FORBIDDEN)
         }
 
         const role = user.is_admin == true ? "admin" : "user"
@@ -222,7 +223,7 @@ export class UserAuthService {
         const user = await this._userAuthRepo.findById(id)
 
         if(!user){
-            return errorResponse(USER_NOT_FOUND , 404)
+            return errorResponse(USER_NOT_FOUND , statusCodes.NOT_FOUND)
         }
 
         const mappedUser = userDto(user)

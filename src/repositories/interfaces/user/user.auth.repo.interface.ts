@@ -1,8 +1,9 @@
 import { Gender, Profile, User } from "../../../generated/prisma/client"
+import { IBaseRepository } from "../base/base.repository.interface"
 
 
-export interface IUserAuthRepository {
-    findById(id : string) : Promise<User | null>
+export interface IUserAuthRepository extends IBaseRepository<User>{
+    // findById(id : string) : Promise<User | null>
     findByEmail(email : string) : Promise<User | null>
     findByUserName(user_name : string) : Promise<User | null> 
     createUser(name : string , user_name : string , email : string , password : string) : Promise<User>

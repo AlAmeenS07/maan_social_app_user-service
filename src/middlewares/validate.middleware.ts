@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodSchema } from "zod";
+import { statusCodes } from "../utils/constants";
 
 export const validate =
   (schema: ZodSchema) =>
@@ -7,7 +8,7 @@ export const validate =
     const result = schema.safeParse(req.body);
 
     if (!result.success) {
-      return res.status(400).json({
+      return res.status(statusCodes.BAD_REQUEST).json({
         success: false,
         errors: result.error.issues,
       });

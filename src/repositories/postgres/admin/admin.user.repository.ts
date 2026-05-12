@@ -1,9 +1,10 @@
 import prisma from "../../../db/prisma.client";
 import { Prisma, User } from "../../../generated/prisma/client";
 import { IAdminUserRepository } from "../../interfaces/admin/admin.user.repo.interface";
+import { IBaseRepository } from "../../interfaces/base/base.repository.interface";
 
 
-export class AdminUserRepository implements IAdminUserRepository{
+export class AdminUserRepository implements IAdminUserRepository , IBaseRepository<User>{
 
     async findAll(filter: Prisma.UserWhereInput, skip: number, limit: number): Promise<User[]> {
         const users = prisma.user.findMany({
