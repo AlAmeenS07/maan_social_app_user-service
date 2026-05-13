@@ -1,5 +1,4 @@
-import { User } from "../../generated/prisma/client";
-
+import { User } from "../../types/user/user.type";
 
 export interface UserDto {
   id: string;

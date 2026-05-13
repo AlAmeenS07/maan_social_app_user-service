@@ -1,23 +1,26 @@
 import prisma from "../../../db/prisma.client";
-import { Gender, Profile, User } from "../../../generated/prisma/client";
+import { Gender, Prisma, Profile, User } from "../../../generated/prisma/client";
 import { IUserAuthRepository } from "../../interfaces/user/user.auth.repo.interface";
+import { BaseRepository } from "../base/base.repository";
 
 
-export class UserAuthRepository implements IUserAuthRepository{
+export class UserAuthRepository extends BaseRepository<
+    User,
+    Prisma.UserFindUniqueArgs,
+    Prisma.UserFindManyArgs,
+    Prisma.UserCreateArgs,
+    Prisma.UserUpdateArgs
+>
+    implements IUserAuthRepository {
 
-    findByEmail(email: string): Promise<User | null> {
-        const user =  prisma.user.findUnique({
-            where : {
-                email 
-            }
-        })
-        return user
+    constructor() {
+        super(prisma.user)
     }
 
-    findById(id: string): Promise<User | null> {
+    findByEmail(email: string): Promise<User | null> {
         const user = prisma.user.findUnique({
-            where : {
-                id
+            where: {
+                email
             }
         })
         return user
@@ -25,20 +28,8 @@ export class UserAuthRepository implements IUserAuthRepository{
 
     findByUserName(user_name: string): Promise<User | null> {
         const user = prisma.user.findUnique({
-            where : {
+            where: {
                 user_name
-            }
-        })
-        return user
-    }
-
-    createUser(name: string, user_name: string, email: string, password: string): Promise<User> {
-        const user = prisma.user.create({
-            data : {
-                name,
-                user_name,
-                email,
-                password
             }
         })
         return user
@@ -46,8 +37,8 @@ export class UserAuthRepository implements IUserAuthRepository{
 
     createUserProfile(id: string, dob: Date, gender: Gender): Promise<Profile> {
         const userProfile = prisma.profile.create({
-            data : {
-                userId : id,
+            data: {
+                userId: id,
                 dob,
                 gender
             }
@@ -57,10 +48,10 @@ export class UserAuthRepository implements IUserAuthRepository{
 
     verifyUser(id: string): Promise<User> {
         const user = prisma.user.update({
-            data : {
-                is_verified : true
+            data: {
+                is_verified: true
             },
-            where : {
+            where: {
                 id
             }
         })
@@ -69,10 +60,10 @@ export class UserAuthRepository implements IUserAuthRepository{
 
     updatePassword(id: string, password: string): Promise<User> {
         const user = prisma.user.update({
-            data : {
+            data: {
                 password
             },
-            where : {
+            where: {
                 id
             }
         })

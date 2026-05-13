@@ -1,12 +1,13 @@
 import { userDto } from "../../dto/user/user.dto";
 import { IAdminAuthRepository } from "../../repositories/interfaces/admin/admin.auth.repo.interface";
 import { comparePassword } from "../../utils/bcrypt.util";
-import { INVALID_CREDENTIALS, INVALID_USER, USER_NOT_FOUND } from "../../utils/constants";
+import { INVALID_CREDENTIALS, INVALID_USER, statusCodes, USER_NOT_FOUND } from "../../utils/constants";
 import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.util";
 import { errorResponse } from "../../utils/response.handler";
+import { IAdminAuthService } from "../interfaces/admin/admin.auth.service.interface";
 
 
-export class AdminAuthService{
+export class AdminAuthService implements IAdminAuthService {
     constructor(
         private _adminRepo : IAdminAuthRepository
     ){}
@@ -17,17 +18,17 @@ export class AdminAuthService{
         const user = await this._adminRepo.findByEmail(email)
 
         if(!user){
-            return errorResponse(USER_NOT_FOUND , 404)
+            return errorResponse(USER_NOT_FOUND , statusCodes.BAD_REQUEST)
         }
 
         if(!user.is_admin){
-            return errorResponse(INVALID_USER , 403)
+            return errorResponse(INVALID_USER , statusCodes.FORBIDDEN)
         }
 
         const checkPassword = await comparePassword(password , user.password)
 
         if(!checkPassword){
-            return errorResponse(INVALID_CREDENTIALS , 400)
+            return errorResponse(INVALID_CREDENTIALS , statusCodes.BAD_REQUEST)
         }
 
         const role = user.is_admin ? "admin" : "user"

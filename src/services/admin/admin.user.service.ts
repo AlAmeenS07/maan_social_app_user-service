@@ -1,33 +1,11 @@
 import { userDto } from "../../dto/user/user.dto";
 import { IAdminUserRepository } from "../../repositories/interfaces/admin/admin.user.repo.interface";
-import { USER_NOT_FOUND } from "../../utils/constants";
+import { FindUsersQuery, UserFilter } from "../../types/admin/user.type";
+import { statusCodes, USER_NOT_FOUND } from "../../utils/constants";
 import { errorResponse } from "../../utils/response.handler";
+import { IAdminUserService } from "../interfaces/admin/admin.user.service.interface";
 
-export type FindUsersQuery = {
-  search?: string;
-  status?: "active" | "blocked" | "";
-  from?: string;
-  to?: string;
-  page?: number;
-  limit?: number;
-};
-
-
-export type UserFilter = {
-  is_admin: boolean;
-  OR?: {
-    name?: { contains: string; mode: "insensitive" };
-    email?: { contains: string; mode: "insensitive" };
-    user_name?: { contains: string; mode: "insensitive" };
-  }[];
-  is_blocked?: boolean;
-  createdAt?: {
-    gte: Date;
-    lte: Date;
-  };
-};
-
-export class AdminUserService {
+export class AdminUserService implements IAdminUserService {
     constructor(
         private _adminUserRepo: IAdminUserRepository
     ) { }
@@ -86,7 +64,7 @@ export class AdminUserService {
         const user = await this._adminUserRepo.findById(id)
 
         if (!user) {
-            return errorResponse(USER_NOT_FOUND, 404)
+            return errorResponse(USER_NOT_FOUND, statusCodes.BAD_REQUEST)
         }
 
         const status = user.is_blocked ? false : true
@@ -94,7 +72,7 @@ export class AdminUserService {
         const updatedUser = await this._adminUserRepo.findByIdAndBlockUnblock(id, status)
 
         if(!updatedUser){
-            return errorResponse(USER_NOT_FOUND, 404)
+            return errorResponse(USER_NOT_FOUND, statusCodes.BAD_REQUEST)
         }
 
         const mappedUser = userDto(updatedUser)

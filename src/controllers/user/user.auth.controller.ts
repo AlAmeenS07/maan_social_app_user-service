@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
-import { UserAuthService } from "../../services/user/user.auth.service";
 import expressAsyncHandler from "express-async-handler";
 import { errorResponse, successResponse } from "../../utils/response.handler";
 import { JwtPayload } from "jsonwebtoken";
 import { veriftyToken } from "../../utils/jwt.util";
-import { LOGIN_ERROR, LOGIN_SUCCESSFULLY, LOGOUT_SUCCESSSFULLY, OTP_SEND_TO_MAIL, OTP_SENDING_ERROR, OTP_VERFIED_SUCCESSFULLY, PASSWORD_RESET_SUCCESSFULLY, REGISTRATION_ERROR, RESET_PASSWORD_ERROR, USER_DATA_FETCH, USER_FETCH_ERROR, USER_NOT_FOUND, VERIFY_OTP_ERROR, TOKEN_MISSING } from "../../utils/constants";
+import { LOGIN_ERROR, LOGIN_SUCCESSFULLY, LOGOUT_SUCCESSSFULLY, OTP_SEND_TO_MAIL, OTP_SENDING_ERROR, OTP_VERFIED_SUCCESSFULLY, PASSWORD_RESET_SUCCESSFULLY, REGISTRATION_ERROR, RESET_PASSWORD_ERROR, USER_DATA_FETCH, USER_FETCH_ERROR, USER_NOT_FOUND, VERIFY_OTP_ERROR, TOKEN_MISSING, statusCodes } from "../../utils/constants";
+import { IUserAuthService } from "../../services/interfaces/user/user.auth.service.interface";
 
 
 export class UserAuthController {
     constructor(
-        private _userService: UserAuthService
+        private _userService: IUserAuthService
     ) { }
 
 
@@ -23,7 +23,7 @@ export class UserAuthController {
             return errorResponse(REGISTRATION_ERROR)
         }
 
-        successResponse(res, user, OTP_SEND_TO_MAIL, 201)
+        successResponse(res, user, OTP_SEND_TO_MAIL, statusCodes.CREATED)
     })
 
     login = expressAsyncHandler(async (req: Request, res: Response) => {
@@ -41,7 +41,7 @@ export class UserAuthController {
         res.cookie("token", refreshToken, {
             httpOnly: true,
             sameSite: "lax",
-            maxAge: 604800000
+            maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE)
         })
 
         successResponse(res, { accessToken, user }, LOGIN_SUCCESSFULLY)
@@ -51,8 +51,7 @@ export class UserAuthController {
 
         res.clearCookie("token", {
             httpOnly: true,
-            sameSite: "lax",
-            maxAge: 604800000
+            sameSite: "lax"
         })
 
         successResponse(res, "", LOGOUT_SUCCESSSFULLY)
@@ -73,10 +72,10 @@ export class UserAuthController {
         res.cookie("token", refreshToken, {
             httpOnly: true,
             sameSite: "lax",
-            maxAge: 604800000
+            maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE)
         })
 
-        successResponse(res, { accessToken, updatedUser }, OTP_VERFIED_SUCCESSFULLY, 200)
+        successResponse(res, { accessToken, updatedUser }, OTP_VERFIED_SUCCESSFULLY)
     })
 
     resendOtp = expressAsyncHandler(async (req: Request, res: Response) => {
@@ -114,10 +113,10 @@ export class UserAuthController {
             return errorResponse(VERIFY_OTP_ERROR)
         }
 
-        res.status(200).cookie("tempToken", token, {
+        res.status(statusCodes.SUCCESS).cookie("tempToken", token, {
             httpOnly: true,
             sameSite: "lax",
-            maxAge: 300000
+            maxAge: Number(process.env.TEMP_TOKEN_MAX_AGE)
         })
             .json({
                 success: true,
@@ -133,7 +132,7 @@ export class UserAuthController {
         const userId = req.headers["x-user-id"]
 
         if (!userId) {
-            return errorResponse(USER_NOT_FOUND, 400)
+            return errorResponse(USER_NOT_FOUND, statusCodes.BAD_REQUEST)
         }
 
         const user = await this._userService.forgotPasswordService(userId as string, password)
@@ -145,7 +144,6 @@ export class UserAuthController {
         res.clearCookie("tempToken", {
             httpOnly: true,
             sameSite: "lax",
-            maxAge: 300000
         })
 
         successResponse(res, user, PASSWORD_RESET_SUCCESSFULLY)
@@ -157,7 +155,7 @@ export class UserAuthController {
         const { token } = req.cookies;
 
         if (!token) {
-            return errorResponse(TOKEN_MISSING, 401)
+            return errorResponse(TOKEN_MISSING, statusCodes.UNAUTHORIZED)
         }
 
         const decoded = veriftyToken(token) as JwtPayload;
@@ -165,7 +163,7 @@ export class UserAuthController {
         const { user, accessToken } = await this._userService.refreshTokenService(decoded.userId)
 
         if (!user || !accessToken) {
-            return errorResponse(USER_FETCH_ERROR, 401)
+            return errorResponse(USER_FETCH_ERROR, statusCodes.UNAUTHORIZED)
         }
 
         successResponse(res, { user, accessToken })
@@ -177,7 +175,7 @@ export class UserAuthController {
         const userId = req.headers["x-user-id"]
 
         if (!userId) {
-            return errorResponse(USER_NOT_FOUND, 404)
+            return errorResponse(USER_NOT_FOUND, statusCodes.BAD_REQUEST)
         }
 
         const user = await this._userService.userDataService(userId as string)
