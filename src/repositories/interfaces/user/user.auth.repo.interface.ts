@@ -1,5 +1,4 @@
 import { Gender, Prisma, Profile, User } from "../../../generated/prisma/client"
-import { UserFindUniqueArgs } from "../../../generated/prisma/models"
 import { IBaseRepository } from "../base/base.repository.interface"
 
 

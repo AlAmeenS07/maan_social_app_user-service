@@ -1,4 +1,3 @@
-import { UserFindUniqueArgs } from "../../../generated/prisma/models";
 import { PrismaDelegate } from "../../../types/prisma/prisma.deligate";
 import { IBaseRepository } from "../../interfaces/base/base.repository.interface";
 

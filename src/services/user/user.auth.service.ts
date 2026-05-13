@@ -2,7 +2,7 @@ import { UserDto, userDto } from "../../dto/user/user.dto";
 import { sendOTPEmail } from "../../helpers/email.helper";
 import { deleteOTP, generateOTP, storeOTP, verifyOTP } from "../../helpers/otp.helper";
 import { IUserAuthRepository } from "../../repositories/interfaces/user/user.auth.repo.interface";
-import { Gender, User } from "../../types/user/user.type";
+import { Gender } from "../../types/user/user.type";
 import { comparePassword, hashPassword } from "../../utils/bcrypt.util";
 import { INVALID_CREDENTIALS, INVALID_OTP, INVALID_USER, OTP_IS_EXPIRED, statusCodes, USER_ALREADY_EXIST_WITH_EMAIL, USER_BLOCKED, USER_NOT_FOUND } from "../../utils/constants";
 import { generateAccessToken, generateRefreshToken, generateTempToken } from "../../utils/jwt.util";
