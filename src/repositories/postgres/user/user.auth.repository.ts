@@ -1,10 +1,21 @@
 import prisma from "../../../db/prisma.client";
-import { Gender, Profile, User } from "../../../generated/prisma/client";
-import { IBaseRepository } from "../../interfaces/base/base.repository.interface";
+import { Gender, Prisma, Profile, User } from "../../../generated/prisma/client";
 import { IUserAuthRepository } from "../../interfaces/user/user.auth.repo.interface";
+import { BaseRepository } from "../base/base.repository";
 
 
-export class UserAuthRepository implements IUserAuthRepository, IBaseRepository<User> {
+export class UserAuthRepository extends BaseRepository<
+    User,
+    Prisma.UserFindUniqueArgs,
+    Prisma.UserFindManyArgs,
+    Prisma.UserCreateArgs,
+    Prisma.UserUpdateArgs
+>
+    implements IUserAuthRepository {
+
+    constructor() {
+        super(prisma.user)
+    }
 
     findByEmail(email: string): Promise<User | null> {
         const user = prisma.user.findUnique({
@@ -15,31 +26,10 @@ export class UserAuthRepository implements IUserAuthRepository, IBaseRepository<
         return user
     }
 
-    findById(id: string): Promise<User | null> {
-        const user = prisma.user.findUnique({
-            where: {
-                id
-            }
-        })
-        return user
-    }
-
     findByUserName(user_name: string): Promise<User | null> {
         const user = prisma.user.findUnique({
             where: {
                 user_name
-            }
-        })
-        return user
-    }
-
-    createUser(name: string, user_name: string, email: string, password: string): Promise<User> {
-        const user = prisma.user.create({
-            data: {
-                name,
-                user_name,
-                email,
-                password
             }
         })
         return user

@@ -27,7 +27,7 @@ export class UserAuthService implements IUserAuthService {
 
         const hashedPassword = await hashPassword(password)
 
-        const user = await this._userAuthRepo.createUser(name, user_name, email, hashedPassword)
+        const user = await this._userAuthRepo.create({data : {name, user_name, email, password : hashedPassword}})
 
         const dobDate = new Date(`${dob}T00:00:00`);
 

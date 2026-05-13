@@ -1,6 +1,13 @@
 
 export type Gender = "male" | "female" | "other"
 
+export type RegisterUserData = {
+    name : string
+    user_name : string
+    email : string
+    password : string
+}
+
 export type User = {
     id: string;
     name: string;
