@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { validate } from "../middlewares/validate.middleware";
-import { loginSchema } from "../validations/zod.validation";
-import { AdminAuthService } from "../services/admin/admin.auth.service";
-import { AdminAuthController } from "../controllers/admin/admin.auth.controller";
-import { AdminAuthRepository } from "../repositories/postgres/admin/admin.auth.repository";
-import { AdminUserService } from "../services/admin/admin.user.service";
-import { AdminUserRepository } from "../repositories/postgres/admin/admin.user.repository";
-import { AdminUserController } from "../controllers/admin/admin.user.controller";
+import { validate } from "../../middlewares/validate.middleware";
+import { loginSchema } from "../../validations/zod.validation";
+import { AdminAuthService } from "../../services/admin/admin.auth.service";
+import { AdminAuthController } from "../../controllers/admin/admin.auth.controller";
+import { AdminAuthRepository } from "../../repositories/postgres/admin/admin.auth.repository";
+import { AdminUserService } from "../../services/admin/admin.user.service";
+import { AdminUserRepository } from "../../repositories/postgres/admin/admin.user.repository";
+import { AdminUserController } from "../../controllers/admin/admin.user.controller";
 
 
 const router = Router()

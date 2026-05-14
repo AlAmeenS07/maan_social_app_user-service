@@ -1,4 +1,4 @@
-import { userDto } from "../../dto/user/user.dto";
+import { userDtoFun } from "../../dto/user/user.dto";
 import { IAdminAuthRepository } from "../../repositories/interfaces/admin/admin.auth.repo.interface";
 import { comparePassword } from "../../utils/bcrypt.util";
 import { INVALID_CREDENTIALS, INVALID_USER, statusCodes, USER_NOT_FOUND } from "../../utils/constants";
@@ -36,7 +36,7 @@ export class AdminAuthService implements IAdminAuthService {
         const accessToken = generateAccessToken(user.id , role)
         const refreshToken = generateRefreshToken(user.id , role)
 
-        const mappedUser = userDto(user)
+        const mappedUser = userDtoFun(user)
 
         return {
             user : mappedUser,

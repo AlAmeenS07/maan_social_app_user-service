@@ -1,4 +1,4 @@
-import { UserDto, userDto } from "../../dto/user/user.dto";
+import { UserDto, userDtoFun } from "../../dto/user/user.dto";
 import { sendOTPEmail } from "../../helpers/email.helper";
 import { deleteOTP, generateOTP, storeOTP, verifyOTP } from "../../helpers/otp.helper";
 import { IUserAuthRepository } from "../../repositories/interfaces/user/user.auth.repo.interface";
@@ -41,7 +41,7 @@ export class UserAuthService implements IUserAuthService {
 
         await storeOTP(key, otp)
 
-        const mappedUser = userDto(user)
+        const mappedUser = userDtoFun(user)
 
         return {
             otp,
@@ -80,7 +80,7 @@ export class UserAuthService implements IUserAuthService {
         const accessToken = generateAccessToken(user.id , role)
         const refreshToken = generateRefreshToken(user.id , role)
 
-        const mappedUser = userDto(user)
+        const mappedUser = userDtoFun(user)
 
         return {
             accessToken,
@@ -112,14 +112,21 @@ export class UserAuthService implements IUserAuthService {
 
         await deleteOTP(key)
 
-        const updatedUser = await this._userAuthRepo.verifyUser(user.id)
+        const updatedUser = await this._userAuthRepo.update({
+            data: {
+                is_verified: true
+            },
+            where: {
+                id : user.id
+            }
+        })
 
         const role: string = updatedUser.is_admin == true ? "admin" : "user"
 
         const accessToken = generateAccessToken(updatedUser.id, role)
         const refreshToken = generateRefreshToken(updatedUser.id, role)
 
-        const mappedUser = userDto(updatedUser)
+        const mappedUser = userDtoFun(updatedUser)
 
         return {
             accessToken,
@@ -179,7 +186,7 @@ export class UserAuthService implements IUserAuthService {
 
     async forgotPasswordService(id: string, password: string) {
 
-        const user = await this._userAuthRepo.findById(id)
+        const user = await this._userAuthRepo.findById({where : {id}})
 
         if (!user) {
             return errorResponse(USER_NOT_FOUND, statusCodes.NOT_FOUND)
@@ -189,14 +196,14 @@ export class UserAuthService implements IUserAuthService {
 
         const updatedUser = await this._userAuthRepo.updatePassword(user.id, hashedPassword)
 
-        const mappedUser = userDto(updatedUser)
+        const mappedUser = userDtoFun(updatedUser)
 
         return mappedUser
     }
 
     async refreshTokenService(id : string){
 
-        const user = await this._userAuthRepo.findById(id)
+        const user = await this._userAuthRepo.findById({where : {id}})
 
         if(!user){
             return errorResponse(USER_NOT_FOUND , statusCodes.NOT_FOUND)
@@ -210,7 +217,7 @@ export class UserAuthService implements IUserAuthService {
 
         const accessToken = generateAccessToken(user.id , role)
 
-        const mappedUser = userDto(user)
+        const mappedUser = userDtoFun(user)
 
         return{
             user : mappedUser,
@@ -220,13 +227,13 @@ export class UserAuthService implements IUserAuthService {
 
     async userDataService(id : string){
         
-        const user = await this._userAuthRepo.findById(id)
+        const user = await this._userAuthRepo.findById({where : {id}})
 
         if(!user){
             return errorResponse(USER_NOT_FOUND , statusCodes.NOT_FOUND)
         }
 
-        const mappedUser = userDto(user)
+        const mappedUser = userDtoFun(user)
 
         return mappedUser
     }

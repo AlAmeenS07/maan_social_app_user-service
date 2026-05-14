@@ -9,7 +9,8 @@ export class AdminUserRepository extends BaseRepository<
     Prisma.UserFindUniqueArgs,
     Prisma.UserFindManyArgs,
     Prisma.UserCreateArgs,
-    Prisma.UserUpdateArgs
+    Prisma.UserUpdateArgs,
+    Prisma.UserDeleteArgs
 > implements IAdminUserRepository {
 
     constructor(){

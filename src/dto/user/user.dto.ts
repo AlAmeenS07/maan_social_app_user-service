@@ -12,7 +12,7 @@ export interface UserDto {
 }
 
 
-export function userDto(user: User): UserDto {
+export function userDtoFun(user: User): UserDto {
   return {
     id: user.id,
     name: user.name,

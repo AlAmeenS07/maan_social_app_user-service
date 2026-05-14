@@ -1,4 +1,4 @@
-import { userDto } from "../../dto/user/user.dto";
+import { userDtoFun } from "../../dto/user/user.dto";
 import { IAdminUserRepository } from "../../repositories/interfaces/admin/admin.user.repo.interface";
 import { FindUsersQuery, UserFilter } from "../../types/admin/user.type";
 import { statusCodes, USER_NOT_FOUND } from "../../utils/constants";
@@ -49,7 +49,7 @@ export class AdminUserService implements IAdminUserService {
         ]);
 
         const updatedUsers = users?.map((user)=>{
-            return userDto(user)
+            return userDtoFun(user)
         })
 
         return {
@@ -61,7 +61,7 @@ export class AdminUserService implements IAdminUserService {
 
     async changeStatusService(id: string) {
 
-        const user = await this._adminUserRepo.findById(id)
+        const user = await this._adminUserRepo.findById({where : {id}})
 
         if (!user) {
             return errorResponse(USER_NOT_FOUND, statusCodes.BAD_REQUEST)
@@ -75,7 +75,7 @@ export class AdminUserService implements IAdminUserService {
             return errorResponse(USER_NOT_FOUND, statusCodes.BAD_REQUEST)
         }
 
-        const mappedUser = userDto(updatedUser)
+        const mappedUser = userDtoFun(updatedUser)
 
         return mappedUser
     }

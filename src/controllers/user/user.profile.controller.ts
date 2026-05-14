@@ -1,0 +1,63 @@
+import expressAsyncHandler from "express-async-handler";
+import { IUserProfileService } from "../../services/interfaces/user/user.profile.service.interface";
+import { Request, Response } from "express";
+import { errorResponse, successResponse } from "../../utils/response.handler";
+import { INVALID_PROFILE_LINKS, PROFILE_FETCHED_SUCCESSFULLY, PROFILE_LINKS_ADDED_SUCCESSFULLY, PROFILE_UPDATED_SUCCESSFULLY, statusCodes, USER_NOT_FOUND } from "../../utils/constants";
+
+
+
+export class UserProfileController {
+    constructor(
+        private _userProfile: IUserProfileService
+    ) { }
+
+
+    getProfile = expressAsyncHandler(async (req: Request, res: Response) => {
+
+        const userId = req.headers["x-user-id"]
+
+        if (!userId) {
+            return errorResponse(USER_NOT_FOUND, statusCodes.NOT_FOUND)
+        }
+
+        const profile = await this._userProfile.fetchUserProfile(userId as string)
+
+        successResponse(res, profile, PROFILE_FETCHED_SUCCESSFULLY)
+
+    })
+
+    updateProfile = expressAsyncHandler(async (req: Request, res: Response) => {
+
+        const { id } = req.params
+
+        if (!id) {
+            return errorResponse(USER_NOT_FOUND, statusCodes.NOT_FOUND)
+        }
+
+        const updateProfile = await this._userProfile.updateProfileService(id as string, req.body)
+
+        successResponse(res, updateProfile, PROFILE_UPDATED_SUCCESSFULLY)
+
+    })
+
+    addProfileLinks = expressAsyncHandler(async (req: Request, res: Response) => {
+
+        const { bioLinks } = req.body
+        const userId = req.headers["x-user-id"]
+
+        if (!userId) {
+            return errorResponse(USER_NOT_FOUND, statusCodes.NOT_FOUND)
+        }
+
+        for (let v of bioLinks) {
+            if (!v?.url?.startsWith("http")) {
+                return errorResponse(INVALID_PROFILE_LINKS , statusCodes.BAD_REQUEST)
+            }
+        }
+
+        const profileLinks = await this._userProfile.addBioLinks(userId as string, bioLinks)
+
+        successResponse(res , profileLinks, PROFILE_LINKS_ADDED_SUCCESSFULLY, statusCodes.CREATED)
+    })
+
+}
