@@ -5,7 +5,7 @@ import { IUserAuthRepository } from "../../repositories/interfaces/user/user.aut
 import { IUserProfileRepository } from "../../repositories/interfaces/user/user.profile.repo.interface";
 import { ProfileLinkInput, ProfileLinkType, ProfileResponseType, ProfileUpdateType } from "../../types/user/profile.types";
 import { User } from "../../types/user/user.type";
-import { PROFILE_NOT_FOUND, statusCodes, USER_ALREADY_EXIST_WITH_USER_NAME, USER_NOT_FOUND } from "../../utils/constants";
+import { LINK_NOT_FOUND, PROFILE_NOT_FOUND, statusCodes, USER_ALREADY_EXIST_WITH_USER_NAME, USER_NOT_FOUND } from "../../utils/constants";
 import { errorResponse } from "../../utils/response.handler";
 import { IUserProfileService } from "../interfaces/user/user.profile.service.interface";
 
@@ -104,6 +104,30 @@ export class UserProfileService implements IUserProfileService{
 
         return profileLinkDtoFun(profileLinks)
 
+    }
+
+    async editBioLinks(userId : string , data : ProfileLinkInput[]) : Promise<ProfileLinkDto[]> {
+
+        const profile = await this._userProfileRepo.findProfileByUserId(userId)
+
+        if(!profile){
+            return errorResponse(PROFILE_NOT_FOUND , statusCodes.NOT_FOUND)
+        }
+
+        const updatedProfileLinks = await this._userProfileRepo.updateBioLinks(profile.id , data)
+
+        return profileLinkDtoFun(updatedProfileLinks)
+    }
+
+    async deleteBioLink(linkId: string): Promise<void> {
+        
+        const link = await this._userProfileRepo.findProfileLinkById(linkId)
+
+        if(!link){
+            return errorResponse(LINK_NOT_FOUND , statusCodes.NOT_FOUND)
+        }
+
+        await this._userProfileRepo.deleteProfileLinkById(linkId)
     }
 
 }

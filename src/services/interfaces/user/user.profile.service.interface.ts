@@ -12,4 +12,8 @@ export interface IUserProfileService {
 
     addBioLinks(userId : string, data : ProfileLinkInput[]) : Promise<ProfileLinkDto[]>
 
+    editBioLinks(userId : string, data : ProfileLinkInput[]) : Promise<ProfileLinkDto[]>
+
+    deleteBioLink(linkId : string) : Promise<void>
+
 }

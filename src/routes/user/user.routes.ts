@@ -36,5 +36,7 @@ router.get("/me" , userController.userData)
 router.get("/profile/me" , userProfileContorller.getProfile)
 router.put("/profile/:id" , validate(updateProfileSchema), userProfileContorller.updateProfile)
 router.post("/profile/links" , validate(profileLinksSchema),  userProfileContorller.addProfileLinks)
+router.put("/profile/links" , userProfileContorller.editProfileLinks)
+router.delete("/profile/links/:id" , userProfileContorller.deleteProfileLink)
 
 export default router

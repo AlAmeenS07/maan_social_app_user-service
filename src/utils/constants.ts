@@ -29,6 +29,9 @@ export const USER_ALREADY_EXIST_WITH_USER_NAME : string = "User already exists w
 export const PROFILE_FETCHED_SUCCESSFULLY : string = "Profile fetched successfully"
 export const INVALID_PROFILE_LINKS : string = "Invalid profile links !"
 export const PROFILE_LINKS_ADDED_SUCCESSFULLY : string = "Profile Links added Successfully"
+export const PROFILE_LINKS_UPDATED_SUCCESSFULLY : string = "Profile links updated successfully"
+export const LINK_NOT_FOUND : string = "Link not found"
+export const LINK_DELETED : string = "Link deleted successfully"
 
 export enum statusCodes {
     SERVER_ERROR = 500,

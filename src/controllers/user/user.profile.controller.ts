@@ -2,7 +2,7 @@ import expressAsyncHandler from "express-async-handler";
 import { IUserProfileService } from "../../services/interfaces/user/user.profile.service.interface";
 import { Request, Response } from "express";
 import { errorResponse, successResponse } from "../../utils/response.handler";
-import { INVALID_PROFILE_LINKS, PROFILE_FETCHED_SUCCESSFULLY, PROFILE_LINKS_ADDED_SUCCESSFULLY, PROFILE_UPDATED_SUCCESSFULLY, statusCodes, USER_NOT_FOUND } from "../../utils/constants";
+import { INVALID_PROFILE_LINKS, LINK_DELETED, LINK_NOT_FOUND, PROFILE_FETCHED_SUCCESSFULLY, PROFILE_LINKS_ADDED_SUCCESSFULLY, PROFILE_UPDATED_SUCCESSFULLY, statusCodes, USER_NOT_FOUND } from "../../utils/constants";
 
 
 
@@ -51,13 +51,41 @@ export class UserProfileController {
 
         for (let v of bioLinks) {
             if (!v?.url?.startsWith("http")) {
-                return errorResponse(INVALID_PROFILE_LINKS , statusCodes.BAD_REQUEST)
+                return errorResponse(INVALID_PROFILE_LINKS, statusCodes.BAD_REQUEST)
             }
         }
 
         const profileLinks = await this._userProfile.addBioLinks(userId as string, bioLinks)
 
-        successResponse(res , profileLinks, PROFILE_LINKS_ADDED_SUCCESSFULLY, statusCodes.CREATED)
+        successResponse(res, profileLinks, PROFILE_LINKS_ADDED_SUCCESSFULLY, statusCodes.CREATED)
+    })
+
+    editProfileLinks = expressAsyncHandler(async (req: Request, res: Response) => {
+
+        const userId = req.headers["x-user-id"]
+
+        const { bioLinks } = req.body
+
+        if(!userId){
+            return errorResponse(USER_NOT_FOUND , statusCodes.NOT_FOUND)
+        }
+
+        const updatedProfileLinks = await this._userProfile.editBioLinks(userId as string , bioLinks)
+
+        successResponse(res , updatedProfileLinks, PROFILE_UPDATED_SUCCESSFULLY)
+    })
+
+    deleteProfileLink = expressAsyncHandler(async(req : Request , res : Response) => {
+
+        const linkId = req.params.id
+
+        if(!linkId){
+            return errorResponse(LINK_NOT_FOUND , statusCodes.NOT_FOUND)
+        }
+
+        await this._userProfile.deleteBioLink(linkId as string)
+
+        successResponse(res , "" , LINK_DELETED)
     })
 
 }

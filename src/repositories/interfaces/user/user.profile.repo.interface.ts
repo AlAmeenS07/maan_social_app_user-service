@@ -16,5 +16,7 @@ export interface IUserProfileRepository extends IBaseRepository
     createBioLinks(profileId: string, data: ProfileLinkInput[]): Promise<ProfileLinkType[]>
     updateBioLinks(profileId: string, data: ProfileLinkInput[]): Promise<ProfileLinkType[]>
     findProfileByUserId(id: string): Promise<Profile | null>
-    findProfileLinks(id : string) : Promise<ProfileLinkType[]>
+    findProfileLinks(profileId : string) : Promise<ProfileLinkType[]>
+    findProfileLinkById(id : string) : Promise<ProfileLinkType | null>
+    deleteProfileLinkById(id : string) : Promise<void>
 }

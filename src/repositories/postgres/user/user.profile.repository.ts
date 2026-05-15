@@ -62,13 +62,30 @@ export class UserProfileRepository extends BaseRepository
         return profile
     }
 
-    async findProfileLinks(id: string): Promise<ProfileLinkType[]> {
+    async findProfileLinks(profileId : string): Promise<ProfileLinkType[]> {
         const profileLinks = prisma.profileLink.findMany({
             where : {
-                profileId : id
+                profileId
             }
         })
         return profileLinks
+    }
+
+    async findProfileLinkById(id: string): Promise<ProfileLinkType | null> {
+        const profileLink = prisma.profileLink.findUnique({
+            where : {
+                id
+            }
+        })
+        return profileLink
+    }
+
+    async deleteProfileLinkById(id: string): Promise<void> {
+        await prisma.profileLink.delete({
+            where : {
+                id
+            }
+        })
     }
 
 }
