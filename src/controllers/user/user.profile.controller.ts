@@ -2,7 +2,7 @@ import expressAsyncHandler from "express-async-handler";
 import { IUserProfileService } from "../../services/interfaces/user/user.profile.service.interface";
 import { Request, Response } from "express";
 import { errorResponse, successResponse } from "../../utils/response.handler";
-import { INVALID_PROFILE_LINKS, LINK_DELETED, LINK_NOT_FOUND, PROFILE_FETCHED_SUCCESSFULLY, PROFILE_LINKS_ADDED_SUCCESSFULLY, PROFILE_UPDATED_SUCCESSFULLY, statusCodes, USER_NOT_FOUND } from "../../utils/constants";
+import { INVALID_PROFILE_LINKS, LINK_DELETED, LINK_NOT_FOUND, PROFILE_FETCHED_SUCCESSFULLY, PROFILE_LINKS_ADDED_SUCCESSFULLY, PROFILE_UPDATED_SUCCESSFULLY, statusCodes, USER_NAME_CHECKED_SUCCESSFULLY, USER_NAME_MISSING, USER_NOT_FOUND } from "../../utils/constants";
 
 
 
@@ -66,26 +66,45 @@ export class UserProfileController {
 
         const { bioLinks } = req.body
 
-        if(!userId){
-            return errorResponse(USER_NOT_FOUND , statusCodes.NOT_FOUND)
+        if (!userId) {
+            return errorResponse(USER_NOT_FOUND, statusCodes.NOT_FOUND)
         }
 
-        const updatedProfileLinks = await this._userProfile.editBioLinks(userId as string , bioLinks)
+        const updatedProfileLinks = await this._userProfile.editBioLinks(userId as string, bioLinks)
 
-        successResponse(res , updatedProfileLinks, PROFILE_UPDATED_SUCCESSFULLY)
+        successResponse(res, updatedProfileLinks, PROFILE_UPDATED_SUCCESSFULLY)
     })
 
-    deleteProfileLink = expressAsyncHandler(async(req : Request , res : Response) => {
+    deleteProfileLink = expressAsyncHandler(async (req: Request, res: Response) => {
 
         const linkId = req.params.id
 
-        if(!linkId){
-            return errorResponse(LINK_NOT_FOUND , statusCodes.NOT_FOUND)
+        if (!linkId) {
+            return errorResponse(LINK_NOT_FOUND, statusCodes.NOT_FOUND)
         }
 
         await this._userProfile.deleteBioLink(linkId as string)
 
-        successResponse(res , "" , LINK_DELETED)
+        successResponse(res, "", LINK_DELETED)
+    })
+
+    checkUserName = expressAsyncHandler(async (req: Request, res: Response) => {
+
+        const { user_name } = req.body
+        const userId = req.headers["x-user-id"]
+
+        if(!userId){
+            return errorResponse(USER_NOT_FOUND, statusCodes.NOT_FOUND)
+        }
+
+        if (!user_name) {
+            return errorResponse(USER_NAME_MISSING, statusCodes.BAD_REQUEST)
+        }
+
+        const result = await this._userProfile.chechUserName(userId as string, user_name)
+
+        successResponse(res, result, USER_NAME_CHECKED_SUCCESSFULLY)
+
     })
 
 }

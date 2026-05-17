@@ -8,7 +8,7 @@ export interface IUserProfileService {
 
     updateProfileService(userId: string, data : ProfileUpdateType) : Promise<ProfileResponseType>
 
-    chechUserName(user_name : string) : Promise<boolean>
+    chechUserName(userId : string, user_name : string) : Promise<boolean>
 
     addBioLinks(userId : string, data : ProfileLinkInput[]) : Promise<ProfileLinkDto[]>
 

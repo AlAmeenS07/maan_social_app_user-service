@@ -32,6 +32,8 @@ export const PROFILE_LINKS_ADDED_SUCCESSFULLY : string = "Profile Links added Su
 export const PROFILE_LINKS_UPDATED_SUCCESSFULLY : string = "Profile links updated successfully"
 export const LINK_NOT_FOUND : string = "Link not found"
 export const LINK_DELETED : string = "Link deleted successfully"
+export const USER_NAME_MISSING : string = "User name is missing !"
+export const USER_NAME_CHECKED_SUCCESSFULLY : string = "User name checked successfully"
 
 export enum statusCodes {
     SERVER_ERROR = 500,

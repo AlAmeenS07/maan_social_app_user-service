@@ -28,6 +28,7 @@ export function profileDtoFun(profile : Profile) : ProfileDto{
         userId : profile.userId,
         gender : profile.gender,
         dob: profile.dob,
+        location : profile.location || '',
         bioHead : profile.bioHead || '',
         bioText : profile.bioText || '',
         avatar : profile.avatar || '',

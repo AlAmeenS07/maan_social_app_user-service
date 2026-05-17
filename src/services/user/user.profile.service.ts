@@ -58,7 +58,7 @@ export class UserProfileService implements IUserProfileService{
 
         const userNameUser = await this._userRepo.findByUserName(user_name as string)
 
-        if(userNameUser){
+        if(userNameUser && userNameUser?.id != userId){
             return errorResponse(USER_ALREADY_EXIST_WITH_USER_NAME , statusCodes.CONFLICT)
         }
 
@@ -80,11 +80,13 @@ export class UserProfileService implements IUserProfileService{
     }
 
 
-    async chechUserName(user_name: string): Promise<boolean> {
+    async chechUserName(userId : string, user_name: string): Promise<boolean> {
 
         const user = await this._userRepo.findByUserName(user_name)
         
-        if(user){
+        const userProfileName = await this._userRepo.findById({where : {id : userId}})
+
+        if(user && userProfileName?.id != user?.id){
             return false
         }
         else{

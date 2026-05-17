@@ -38,5 +38,6 @@ router.put("/profile/:id" , validate(updateProfileSchema), userProfileContorller
 router.post("/profile/links" , validate(profileLinksSchema),  userProfileContorller.addProfileLinks)
 router.put("/profile/links" , userProfileContorller.editProfileLinks)
 router.delete("/profile/links/:id" , userProfileContorller.deleteProfileLink)
+router.post("/profile/user-name/check" , userProfileContorller.checkUserName)
 
 export default router
