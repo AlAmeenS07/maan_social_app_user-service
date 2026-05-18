@@ -54,3 +54,13 @@ export const profileLinksSchema = z.object({
         })
     )
 });
+
+export const updateProfileLinksSchema = z.object({
+    bioLinks: z.array(
+        z.object({
+            title: z.string().trim().min(1, "Title is required!"),
+            url: z.string().trim().startsWith("http", "URL must start with http or https!"),
+            linkId : z.string()
+        })
+    )
+});

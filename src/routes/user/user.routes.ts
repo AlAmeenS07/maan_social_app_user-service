@@ -2,7 +2,7 @@ import { Router } from "express";
 import { UserAuthController } from "../../controllers/user/user.auth.controller";
 import { UserAuthService } from "../../services/user/user.auth.service";
 import { UserAuthRepository } from "../../repositories/postgres/user/user.auth.repository";
-import { emailSchema, loginSchema, otpSchema, passwordSchema, profileLinksSchema, registerSchema, updateProfileSchema } from "../../validations/zod.validation";
+import { emailSchema, loginSchema, otpSchema, passwordSchema, profileLinksSchema, registerSchema, updateProfileLinksSchema, updateProfileSchema } from "../../validations/zod.validation";
 import { validate } from "../../middlewares/validate.middleware";
 import { UserProfileRepository } from "../../repositories/postgres/user/user.profile.repository";
 import { UserProfileService } from "../../services/user/user.profile.service";
@@ -19,6 +19,10 @@ const userProfileService = new UserProfileService(userRepo , userProfileRepo)
 const userProfileContorller = new UserProfileController(userProfileService)
 
 
+// router.use((req , res , next)=>{
+//     console.log("router-came" , req.headers)
+//     next()
+// })
 
 
 router.post("/auth/register" , validate(registerSchema) , userController.register)
@@ -34,10 +38,10 @@ router.get("/refresh-token" , userController.refreshToken)
 router.get("/me" , userController.userData)
 
 router.get("/profile/me" , userProfileContorller.getProfile)
-router.put("/profile/:id" , validate(updateProfileSchema), userProfileContorller.updateProfile)
 router.post("/profile/links" , validate(profileLinksSchema),  userProfileContorller.addProfileLinks)
-router.put("/profile/links" , userProfileContorller.editProfileLinks)
+router.put("/profile/links" , validate(updateProfileLinksSchema), userProfileContorller.editProfileLinks)
 router.delete("/profile/links/:id" , userProfileContorller.deleteProfileLink)
 router.post("/profile/user-name/check" , userProfileContorller.checkUserName)
+router.put("/profile/:id" , validate(updateProfileSchema), userProfileContorller.updateProfile)
 
 export default router

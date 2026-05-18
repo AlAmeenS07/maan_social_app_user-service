@@ -125,6 +125,8 @@ export class UserProfileService implements IUserProfileService{
         
         const link = await this._userProfileRepo.findProfileLinkById(linkId)
 
+        console.log("service-linkt-delete" , link)
+
         if(!link){
             return errorResponse(LINK_NOT_FOUND , statusCodes.NOT_FOUND)
         }

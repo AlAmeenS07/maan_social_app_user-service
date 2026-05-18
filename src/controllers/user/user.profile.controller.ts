@@ -79,6 +79,8 @@ export class UserProfileController {
 
         const linkId = req.params.id
 
+        console.log("controller-link-delete" , linkId)
+
         if (!linkId) {
             return errorResponse(LINK_NOT_FOUND, statusCodes.NOT_FOUND)
         }
