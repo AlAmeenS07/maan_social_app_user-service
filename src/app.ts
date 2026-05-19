@@ -6,15 +6,15 @@ import { connectRedis } from "./config/redis"
 import { errorHandler } from "./middlewares/error.middleware"
 import cookieParser from "cookie-parser"
 import adminRoutes from "./routes/admin/admin.routes"
+import { consumer, producer } from "./config/kafka"
+import { createUsersIndex } from "./elastic-search/index/user.index"
+import { startUserSyncConsumer } from "./kafka/consumers/user.sync.consumer"
 
 dotenv.config()
 
 const app = express()
 app.use(express.json())
 app.use(cookieParser())
-
-connectRedis()
-verifyMailer()
 
 // app.use((req , res , next)=>{
 //     console.log("here" , req.headers , req.body)
@@ -35,7 +35,25 @@ app.use(errorHandler)
 
 const PORT: number = Number(process.env.PORT)
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`)
-})
+const startServer = async () => {
 
+  await producer.connect();
+
+  await consumer.connect();
+
+  await createUsersIndex();
+
+  await startUserSyncConsumer();
+
+  connectRedis();
+
+  verifyMailer();
+
+  app.listen(PORT, () => {
+    console.log(
+      `Server running on http://localhost:${PORT}`
+    );
+  });
+};
+
+startServer();

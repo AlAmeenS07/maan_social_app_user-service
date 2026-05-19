@@ -1,6 +1,7 @@
 import prisma from "../../db/prisma.client";
 import { profileDtoFun, ProfileLinkDto, profileLinkDtoFun } from "../../dto/user/profile.dto";
 import { userDtoFun } from "../../dto/user/user.dto";
+import { publishUserSyncEvent } from "../../kafka/producers/user.sync.producer";
 import { IUserAuthRepository } from "../../repositories/interfaces/user/user.auth.repo.interface";
 import { IUserProfileRepository } from "../../repositories/interfaces/user/user.profile.repo.interface";
 import { ProfileLinkInput, ProfileLinkType, ProfileResponseType, ProfileUpdateType } from "../../types/user/profile.types";
@@ -72,6 +73,8 @@ export class UserProfileService implements IUserProfileService{
         const dtoProfile = profileDtoFun(updateProfile)
         const dtoProfileLinks = profileLinkDtoFun(profileLinks)
 
+        await publishUserSyncEvent(updatedUser.id)
+
         return {
             user : dtoUser,
             profile : dtoProfile,
@@ -104,6 +107,8 @@ export class UserProfileService implements IUserProfileService{
 
         const profileLinks = await this._userProfileRepo.createBioLinks(profile.id , data)
 
+        await publishUserSyncEvent(userId)
+
         return profileLinkDtoFun(profileLinks)
 
     }
@@ -118,10 +123,12 @@ export class UserProfileService implements IUserProfileService{
 
         const updatedProfileLinks = await this._userProfileRepo.updateBioLinks(profile.id , data)
 
+        await publishUserSyncEvent(userId)
+
         return profileLinkDtoFun(updatedProfileLinks)
     }
 
-    async deleteBioLink(linkId: string): Promise<void> {
+    async deleteBioLink(userId: string, linkId: string): Promise<void> {
         
         const link = await this._userProfileRepo.findProfileLinkById(linkId)
 
@@ -130,6 +137,8 @@ export class UserProfileService implements IUserProfileService{
         if(!link){
             return errorResponse(LINK_NOT_FOUND , statusCodes.NOT_FOUND)
         }
+
+        await publishUserSyncEvent(userId)
 
         await this._userProfileRepo.deleteProfileLinkById(linkId)
     }
