@@ -33,3 +33,34 @@ export const loginSchema = z.object({
     email : z.string().email("Invalid email !"),
     password : z.string()
 })
+
+
+export const updateProfileSchema = z.object({
+    name: z.string().trim().min(2, "Name must be minimum 2 letters!").optional(),
+    user_name: z.string().trim().min(3, "Username must be minimum 3 letters!").optional(),
+    gender: z.enum(["male", "female", "other"]),
+    dob: z.string().refine((val) => !isNaN(new Date(val).getTime()) && new Date(val) < new Date(), { message: "DOB must be a valid date in the past" }),
+    avatar: z.string().trim().optional(),
+    bioHead: z.string().trim().max(50, "Bio heading must be below 50 characters!").optional(),
+    bioText: z.string().trim().max(250, "Bio must be below 250 characters!").optional(),
+    location: z.string().trim().optional()
+});
+
+export const profileLinksSchema = z.object({
+    bioLinks: z.array(
+        z.object({
+            title: z.string().trim().min(1, "Title is required!"),
+            url: z.string().trim().startsWith("http", "URL must start with http or https!")
+        })
+    )
+});
+
+export const updateProfileLinksSchema = z.object({
+    bioLinks: z.array(
+        z.object({
+            title: z.string().trim().min(1, "Title is required!"),
+            url: z.string().trim().startsWith("http", "URL must start with http or https!"),
+            linkId : z.string()
+        })
+    )
+});

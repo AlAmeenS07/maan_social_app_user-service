@@ -23,8 +23,17 @@ export const SOMETHING_ERROR : string = "Something error !"
 export const USERS_FETCH_SUCCESSFULLY : string = "Users fetched successfully"
 export const USER_STATUS_CHANGED_SUCCESSFULLY : string = "User status changed successfully"
 export const USER_BLOCKED : string = "User is blocked by admin !"
-
-
+export const PROFILE_UPDATED_SUCCESSFULLY  : string = "Profile Updated successfully"
+export const PROFILE_NOT_FOUND :  string = "Profile not found !"
+export const USER_ALREADY_EXIST_WITH_USER_NAME : string = "User already exists with user_name !"
+export const PROFILE_FETCHED_SUCCESSFULLY : string = "Profile fetched successfully"
+export const INVALID_PROFILE_LINKS : string = "Invalid profile links !"
+export const PROFILE_LINKS_ADDED_SUCCESSFULLY : string = "Profile Links added Successfully"
+export const PROFILE_LINKS_UPDATED_SUCCESSFULLY : string = "Profile links updated successfully"
+export const LINK_NOT_FOUND : string = "Link not found"
+export const LINK_DELETED : string = "Link deleted successfully"
+export const USER_NAME_MISSING : string = "User name is missing !"
+export const USER_NAME_CHECKED_SUCCESSFULLY : string = "User name checked successfully"
 
 export enum statusCodes {
     SERVER_ERROR = 500,

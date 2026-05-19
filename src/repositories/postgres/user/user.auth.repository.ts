@@ -9,7 +9,8 @@ export class UserAuthRepository extends BaseRepository<
     Prisma.UserFindUniqueArgs,
     Prisma.UserFindManyArgs,
     Prisma.UserCreateArgs,
-    Prisma.UserUpdateArgs
+    Prisma.UserUpdateArgs,
+    Prisma.UserDeleteArgs
 >
     implements IUserAuthRepository {
 

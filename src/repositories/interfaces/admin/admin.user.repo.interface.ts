@@ -2,7 +2,7 @@ import { Prisma, User } from "../../../generated/prisma/client";
 import { IBaseRepository } from "../base/base.repository.interface";
 
 
-export interface IAdminUserRepository extends IBaseRepository<User, Prisma.UserCreateArgs >{
+export interface IAdminUserRepository extends IBaseRepository<User, Prisma.UserFindUniqueArgs, Prisma.UserFindManyArgs, Prisma.UserCreateArgs, Prisma.UserUpdateArgs, Prisma.UserDeleteArgs>{
     findAll(filter : Prisma.UserWhereInput , skip : number , limit : number) : Promise<User[]>
     count(filter : Prisma.UserWhereInput) : Promise<number>
     findByIdAndBlockUnblock(id : string , status : boolean) : Promise<User | null>

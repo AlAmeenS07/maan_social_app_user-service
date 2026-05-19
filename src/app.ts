@@ -1,11 +1,11 @@
 import express from "express"
 import dotenv from "dotenv"
-import userRoutes from "./routes/user.routes"
+import userRoutes from "./routes/user/user.routes"
 import { verifyMailer } from "./config/node.mailer"
 import { connectRedis } from "./config/redis"
 import { errorHandler } from "./middlewares/error.middleware"
 import cookieParser from "cookie-parser"
-import adminRoutes from "./routes/admin.routes"
+import adminRoutes from "./routes/admin/admin.routes"
 
 dotenv.config()
 
