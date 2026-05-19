@@ -137,10 +137,10 @@ export class UserProfileService implements IUserProfileService{
         if(!link){
             return errorResponse(LINK_NOT_FOUND , statusCodes.NOT_FOUND)
         }
-
-        await publishUserSyncEvent(userId)
-
+        
         await this._userProfileRepo.deleteProfileLinkById(linkId)
+        
+        await publishUserSyncEvent(userId)
     }
 
 }
