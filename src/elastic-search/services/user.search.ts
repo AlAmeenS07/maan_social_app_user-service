@@ -16,26 +16,6 @@ export const searchUsersElasticsearch = async ({ search = "", status = "", from 
     const filter: any[] = [];
 
 
-    // if (search) {
-    //     must.push({
-
-    //         multi_match: {
-
-    //             query: search,
-
-    //             fields: [
-    //                 "name",
-    //                 "email",
-    //                 "user_name",
-    //                 "profile.bioHead"
-    //             ],
-
-    //             fuzziness: "AUTO",
-    //         },
-    //     });
-    // }
-
-
     if (search?.trim()) {
 
         must.push({
@@ -73,11 +53,6 @@ export const searchUsersElasticsearch = async ({ search = "", status = "", from 
     }
 
 
-
-    // =====================================
-    // STATUS FILTER
-    // =====================================
-
     if (status === "active") {
 
         filter.push({
@@ -96,10 +71,6 @@ export const searchUsersElasticsearch = async ({ search = "", status = "", from 
         });
     }
 
-    // =====================================
-    // DATE FILTER
-    // =====================================
-
     if (from && to) {
 
         filter.push({
@@ -116,15 +87,8 @@ export const searchUsersElasticsearch = async ({ search = "", status = "", from 
         });
     }
 
-    // =====================================
-    // PAGINATION
-    // =====================================
 
     const fromValue = (page - 1) * limit;
-
-    // =====================================
-    // SEARCH QUERY
-    // =====================================
 
     const result = await esClient.search({
 
@@ -153,19 +117,9 @@ export const searchUsersElasticsearch = async ({ search = "", status = "", from 
         ],
     });
 
-    // =====================================
-    // RESPONSE
-    // =====================================
 
     return {
-
-        users: result.hits.hits.map(
-            (item: any) => item._source
-        ),
-
-        total:
-            typeof result.hits.total === "number"
-                ? result.hits.total
-                : result.hits.total?.value || 0,
+        users: result.hits.hits.map((item: any) => item._source),
+        total: typeof result.hits.total === "number" ? result.hits.total : result.hits.total?.value || 0,
     };
 };

@@ -2,9 +2,7 @@ import { esClient } from "../../config/elastic.search";
 
 export const createUsersIndex = async () => {
 
-  const exists = await esClient.indices.exists({
-    index: "users",
-  });
+  const exists = await esClient.indices.exists({index: "users"});
 
   if (exists) {
     console.log("Users index already exists");

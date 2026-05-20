@@ -11,25 +11,18 @@ const _userService = new UserProfileService(userRepo , userProfileRepo)
 
 export const syncUserToElasticsearch = async (userId: string) => {
 
-  // STEP 1
   const fullData = await _userService.fetchUserProfile(userId);
 
   if (!fullData) {
     return;
   }
 
-  // STEP 2
   const document = transformUserSearchDocument(fullData.user , fullData.profile , fullData.profileLinks);
 
-  // STEP 3
   await esClient.update({
-
     index: "users",
-
     id: userId,
-
     doc: document,
-
     doc_as_upsert: true,
   });
 

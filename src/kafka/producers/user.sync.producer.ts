@@ -6,9 +6,7 @@ export const publishUserSyncEvent = async (userId: string) => {
     topic: "user.search.sync",
     messages: [
       {
-        value: JSON.stringify({
-          userId,
-        }),
+        value: JSON.stringify({userId})
       },
     ],
   });

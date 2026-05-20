@@ -15,9 +15,7 @@ export const startUserSyncConsumer = async () => {
 
       try {
 
-        const value = JSON.parse(
-          message.value?.toString() || "{}"
-        );
+        const value = JSON.parse(message.value?.toString() || "{}");
 
         await syncUserToElasticsearch(value.userId);
 
