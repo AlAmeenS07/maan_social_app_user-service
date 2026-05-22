@@ -19,6 +19,8 @@ export const syncUserToElasticsearch = async (userId: string) => {
 
   const document = transformUserSearchDocument(fullData.user , fullData.profile , fullData.profileLinks);
 
+  console.log("doc" , document)
+
   await esClient.update({
     index: "users",
     id: userId,

@@ -1,9 +1,11 @@
+import { profileDtoFun, profileLinkDtoFun } from "../../dto/user/profile.dto";
 import { userDtoFun } from "../../dto/user/user.dto";
 import { searchUsersElasticsearch } from "../../elastic-search/services/user.search";
 import { publishUserSyncEvent } from "../../kafka/producers/user.sync.producer";
 import { IAdminUserRepository } from "../../repositories/interfaces/admin/admin.user.repo.interface";
 import { FindUsersQuery, UserFilter } from "../../types/admin/user.type";
-import { statusCodes, USER_NOT_FOUND } from "../../utils/constants";
+import { ProfileResponseType } from "../../types/user/profile.types";
+import { PROFILE_NOT_FOUND, statusCodes, USER_NOT_FOUND } from "../../utils/constants";
 import { errorResponse } from "../../utils/response.handler";
 import { IAdminUserService } from "../interfaces/admin/admin.user.service.interface";
 
@@ -67,7 +69,7 @@ export class AdminUserService implements IAdminUserService {
 
         const { search, status, from, to, page = 1, limit = 10 } = query;
 
-        const result = await searchUsersElasticsearch({search, status, from, to, page, limit });
+        const result = await searchUsersElasticsearch({ search, status, from, to, page, limit });
 
         return {
             users: result.users,
@@ -97,5 +99,31 @@ export class AdminUserService implements IAdminUserService {
 
         return mappedUser
     }
+
+
+    async fetchUserProfile(id: string): Promise<ProfileResponseType> {
+
+        const user = await this._adminUserRepo.findById({ where: { id } })
+
+        if (!user) {
+            return errorResponse(USER_NOT_FOUND, statusCodes.NOT_FOUND)
+        }
+
+        const profile = await this._adminUserRepo.findProfileByUserId(id)
+
+        if (!profile) {
+            return errorResponse(PROFILE_NOT_FOUND, statusCodes.NOT_FOUND)
+        }
+
+        const profileLinks = await this._adminUserRepo.findUserProfileLinkById(profile.id)
+
+        return {
+            user: userDtoFun(user),
+            profile: profileDtoFun(profile),
+            profileLinks: profileLinkDtoFun(profileLinks)
+        }
+
+    }
+
 
 }

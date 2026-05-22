@@ -1,5 +1,6 @@
 import prisma from "../../../db/prisma.client";
-import { Prisma, User } from "../../../generated/prisma/client";
+import { Prisma, Profile, User } from "../../../generated/prisma/client";
+import { ProfileLinkType } from "../../../types/user/profile.types";
 import { IAdminUserRepository } from "../../interfaces/admin/admin.user.repo.interface";
 import { BaseRepository } from "../base/base.repository";
 
@@ -13,7 +14,7 @@ export class AdminUserRepository extends BaseRepository<
     Prisma.UserDeleteArgs
 > implements IAdminUserRepository {
 
-    constructor(){
+    constructor() {
         super(prisma.user)
     }
 
@@ -47,4 +48,23 @@ export class AdminUserRepository extends BaseRepository<
         })
         return user
     }
+
+    async findProfileByUserId(id: string): Promise<Profile | null> {
+        const profile = prisma.profile.findUnique({
+            where: {
+                userId: id
+            }
+        })
+        return profile
+    }
+
+    async findUserProfileLinkById(profileId: string): Promise<ProfileLinkType[]> {
+        const profileLinks = prisma.profileLink.findMany({
+            where: {
+                profileId
+            }
+        })
+        return profileLinks
+    }
+
 }

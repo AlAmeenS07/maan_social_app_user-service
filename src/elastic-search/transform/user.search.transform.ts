@@ -4,7 +4,7 @@ import { UserDto } from "../../dto/user/user.dto";
 export const transformUserSearchDocument = (user: UserDto, profile: ProfileDto, profileLinks: ProfileLinkDto[]) => {
 
     return {
-        userId: user.id,
+        id: user.id,
         name: user.name,
         user_name: user.user_name,
         email: user.email,
@@ -12,6 +12,7 @@ export const transformUserSearchDocument = (user: UserDto, profile: ProfileDto, 
         is_verified: user.is_verified,
         createdAt: user.createdAt,
         profile: {
+            id: profile?.id || '',
             avatar: profile?.avatar || "",
             gender: profile?.gender || null,
             dob: profile?.dob || null,

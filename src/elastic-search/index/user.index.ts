@@ -17,7 +17,7 @@ export const createUsersIndex = async () => {
 
       properties: {
 
-        userId: {
+        id: {
           type: "keyword"
         },
 
