@@ -24,7 +24,7 @@ export class UserAuthService implements IUserAuthService {
             return errorResponse(USER_ALREADY_EXIST_WITH_EMAIL, statusCodes.CONFLICT)
         }
 
-        const user_name: string = email
+        const user_name: string = email.split("@")[0] + email.split("@")[1]
 
         const hashedPassword = await hashPassword(password)
 
@@ -60,8 +60,6 @@ export class UserAuthService implements IUserAuthService {
             return errorResponse(USER_NOT_FOUND , statusCodes.BAD_REQUEST)
         }
 
-        console.log("here-service-login" , user)
-
         if(user.is_admin){
             return errorResponse(INVALID_USER , statusCodes.BAD_REQUEST)
         }
@@ -71,8 +69,6 @@ export class UserAuthService implements IUserAuthService {
         }
 
         const checkPassword = await comparePassword(password , user.password)
-
-        console.log("check-password" , checkPassword)
 
         if(!checkPassword){
             return errorResponse(INVALID_CREDENTIALS , statusCodes.BAD_REQUEST)
