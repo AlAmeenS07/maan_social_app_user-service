@@ -1,11 +1,9 @@
-import prisma from "../../db/prisma.client";
 import { profileDtoFun, ProfileLinkDto, profileLinkDtoFun } from "../../dto/user/profile.dto";
 import { userDtoFun } from "../../dto/user/user.dto";
 import { publishUserSyncEvent } from "../../kafka/producers/user.sync.producer";
 import { IUserAuthRepository } from "../../repositories/interfaces/user/user.auth.repo.interface";
 import { IUserProfileRepository } from "../../repositories/interfaces/user/user.profile.repo.interface";
-import { ProfileLinkInput, ProfileLinkType, ProfileResponseType, ProfileUpdateType } from "../../types/user/profile.types";
-import { User } from "../../types/user/user.type";
+import { ProfileLinkInput, ProfileResponseType, ProfileUpdateType } from "../../types/user/profile.types";
 import { LINK_NOT_FOUND, PROFILE_NOT_FOUND, statusCodes, USER_ALREADY_EXIST_WITH_USER_NAME, USER_NOT_FOUND } from "../../utils/constants";
 import { errorResponse } from "../../utils/response.handler";
 import { IUserProfileService } from "../interfaces/user/user.profile.service.interface";

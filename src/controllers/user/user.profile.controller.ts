@@ -49,7 +49,7 @@ export class UserProfileController {
             return errorResponse(USER_NOT_FOUND, statusCodes.NOT_FOUND)
         }
 
-        for (let v of bioLinks) {
+        for (const v of bioLinks) {
             if (!v?.url?.startsWith("http")) {
                 return errorResponse(INVALID_PROFILE_LINKS, statusCodes.BAD_REQUEST)
             }

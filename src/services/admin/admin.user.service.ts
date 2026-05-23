@@ -3,7 +3,7 @@ import { userDtoFun } from "../../dto/user/user.dto";
 import { searchUsersElasticsearch } from "../../elastic-search/services/user.search";
 import { publishUserSyncEvent } from "../../kafka/producers/user.sync.producer";
 import { IAdminUserRepository } from "../../repositories/interfaces/admin/admin.user.repo.interface";
-import { FindUsersQuery, UserFilter } from "../../types/admin/user.type";
+import { FindUsersQuery } from "../../types/admin/user.type";
 import { ProfileResponseType } from "../../types/user/profile.types";
 import { PROFILE_NOT_FOUND, statusCodes, USER_NOT_FOUND } from "../../utils/constants";
 import { errorResponse } from "../../utils/response.handler";

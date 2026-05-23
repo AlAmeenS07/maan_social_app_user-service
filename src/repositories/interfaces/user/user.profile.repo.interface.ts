@@ -1,5 +1,5 @@
 import { Prisma, Profile } from "../../../generated/prisma/client";
-import { ProfileLinkInput, ProfileLinkType, ProfileResponseType } from "../../../types/user/profile.types";
+import { ProfileLinkInput, ProfileLinkType } from "../../../types/user/profile.types";
 import { IBaseRepository } from "../base/base.repository.interface";
 
 

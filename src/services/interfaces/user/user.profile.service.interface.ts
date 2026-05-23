@@ -1,5 +1,5 @@
 import { ProfileLinkDto } from "../../../dto/user/profile.dto";
-import { ProfileLinkInput, ProfileLinkType, ProfileResponseType, ProfileUpdateType } from "../../../types/user/profile.types";
+import { ProfileLinkInput, ProfileResponseType, ProfileUpdateType } from "../../../types/user/profile.types";
 
 
 export interface IUserProfileService {
