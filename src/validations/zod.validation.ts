@@ -30,14 +30,14 @@ export const passwordSchema = z.object({
 })
 
 export const loginSchema = z.object({
-    email : z.string().email("Invalid email !"),
-    password : z.string()
+    email: z.string().email("Invalid email !"),
+    password: z.string()
 })
 
 
 export const updateProfileSchema = z.object({
-    name: z.string().trim().min(2, "Name must be minimum 2 letters!").optional(),
-    user_name: z.string().trim().min(3, "Username must be minimum 3 letters!").optional(),
+    name: z.string().trim().min(2, "Name must be minimum 2 letters!"),
+    user_name: z.string().trim().min(3, "Username must be minimum 3 letters!").max(30, "Username cannot exceed 30 characters!").regex(/^[a-zA-Z0-9._@]+$/,"Username can only contain letters, numbers, ., _ and @"),
     gender: z.enum(["male", "female", "other"]),
     dob: z.string().refine((val) => !isNaN(new Date(val).getTime()) && new Date(val) < new Date(), { message: "DOB must be a valid date in the past" }),
     avatar: z.string().trim().optional(),
@@ -60,7 +60,7 @@ export const updateProfileLinksSchema = z.object({
         z.object({
             title: z.string().trim().min(1, "Title is required!"),
             url: z.string().trim().startsWith("http", "URL must start with http or https!"),
-            linkId : z.string()
+            linkId: z.string()
         })
     )
 });
