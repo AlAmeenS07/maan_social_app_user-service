@@ -49,7 +49,7 @@ export class UserProfileController {
             return errorResponse(USER_NOT_FOUND, statusCodes.NOT_FOUND)
         }
 
-        for (let v of bioLinks) {
+        for (const v of bioLinks) {
             if (!v?.url?.startsWith("http")) {
                 return errorResponse(INVALID_PROFILE_LINKS, statusCodes.BAD_REQUEST)
             }
@@ -77,15 +77,21 @@ export class UserProfileController {
 
     deleteProfileLink = expressAsyncHandler(async (req: Request, res: Response) => {
 
+        const userId = req.headers["x-user-id"]
+
+        if(!userId){
+            return errorResponse(USER_NOT_FOUND, statusCodes.NOT_FOUND)
+        }
+
         const linkId = req.params.id
 
-        console.log("controller-link-delete" , linkId)
+        console.log("controller-link-delete", linkId)
 
         if (!linkId) {
             return errorResponse(LINK_NOT_FOUND, statusCodes.NOT_FOUND)
         }
 
-        await this._userProfile.deleteBioLink(linkId as string)
+        await this._userProfile.deleteBioLink(userId as string , linkId as string)
 
         successResponse(res, "", LINK_DELETED)
     })
@@ -95,7 +101,7 @@ export class UserProfileController {
         const { user_name } = req.body
         const userId = req.headers["x-user-id"]
 
-        if(!userId){
+        if (!userId) {
             return errorResponse(USER_NOT_FOUND, statusCodes.NOT_FOUND)
         }
 

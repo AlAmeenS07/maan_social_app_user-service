@@ -42,4 +42,18 @@ export class AdminUserController {
         successResponse(res, user, USER_STATUS_CHANGED_SUCCESSFULLY)
 
     })
+
+    findUser = expressAsyncHandler(async(req: Request, res : Response)=>{
+
+        const { id } = req.params
+
+        if (!id) {
+            return errorResponse(USER_NOT_FOUND, 404)
+        }
+
+        const user = await this._adminUserService.fetchUserProfile(id as string)
+
+        successResponse(res , user , USERS_FETCH_SUCCESSFULLY)
+    })
+
 }

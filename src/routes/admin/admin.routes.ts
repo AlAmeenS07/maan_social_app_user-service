@@ -24,6 +24,7 @@ router.post("/auth/login" , validate(loginSchema) , adminAuthController.loginAdm
 router.post("/auth/logout" , adminAuthController.logoutAdmin)
 
 router.get("/users" , adminUserController.findAllUsers)
+router.get("/users/:id", adminUserController.findUser)
 router.patch("/users/:id" , adminUserController.changeStatus)
 
 

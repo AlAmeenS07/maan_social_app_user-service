@@ -1,6 +1,7 @@
 import { UserDto, userDtoFun } from "../../dto/user/user.dto";
 import { sendOTPEmail } from "../../helpers/email.helper";
 import { deleteOTP, generateOTP, storeOTP, verifyOTP } from "../../helpers/otp.helper";
+import { publishUserSyncEvent } from "../../kafka/producers/user.sync.producer";
 import { IUserAuthRepository } from "../../repositories/interfaces/user/user.auth.repo.interface";
 import { Gender } from "../../types/user/user.type";
 import { comparePassword, hashPassword } from "../../utils/bcrypt.util";
@@ -42,6 +43,8 @@ export class UserAuthService implements IUserAuthService {
         await storeOTP(key, otp)
 
         const mappedUser = userDtoFun(user)
+
+        await publishUserSyncEvent(user.id)
 
         return {
             otp,
@@ -128,6 +131,8 @@ export class UserAuthService implements IUserAuthService {
 
         const mappedUser = userDtoFun(updatedUser)
 
+        await publishUserSyncEvent(updatedUser.id)
+
         return {
             accessToken,
             refreshToken,
@@ -197,6 +202,8 @@ export class UserAuthService implements IUserAuthService {
         const updatedUser = await this._userAuthRepo.updatePassword(user.id, hashedPassword)
 
         const mappedUser = userDtoFun(updatedUser)
+
+        await publishUserSyncEvent(updatedUser.id)
 
         return mappedUser
     }
