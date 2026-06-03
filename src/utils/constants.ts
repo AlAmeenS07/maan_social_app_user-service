@@ -34,6 +34,9 @@ export const LINK_NOT_FOUND : string = "Link not found"
 export const LINK_DELETED : string = "Link deleted successfully"
 export const USER_NAME_MISSING : string = "User name is missing !"
 export const USER_NAME_CHECKED_SUCCESSFULLY : string = "User name checked successfully"
+export const REQUEST_COMPLETED : string = "REQUEST_COMPLETED"
+export const REQUEST_FAILED : string = "REQUEST_FAILED"
+export const USER_SERVICE : string = "user-service"
 
 export enum statusCodes {
     SERVER_ERROR = 500,

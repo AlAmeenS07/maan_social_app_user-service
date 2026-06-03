@@ -11,6 +11,7 @@ import { createUsersIndex } from "./elastic-search/index/user.index"
 import { startUserSyncConsumer } from "./kafka/consumers/user.sync.consumer"
 import { metricsMiddleware } from "./middlewares/metrics.middleware"
 import register from "./config/prom.client"
+import { requestLogger } from "./middlewares/req.logger"
 
 dotenv.config()
 
@@ -18,6 +19,7 @@ const app = express()
 app.use(express.json())
 app.use(cookieParser())
 
+app.use(requestLogger)
 app.use(metricsMiddleware)
 
 // app.use((req , res , next)=>{
